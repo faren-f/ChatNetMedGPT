@@ -8,17 +8,12 @@ cd NetMedGPT
 conda env craete -f chatnetmedgpt.yml
 ```
 
-2. Download the data
+2. Download the data and model parameters
 ```
 wget https://cloud.uni-hamburg.de/public.php/dav/files/AoHLe9ARTC6Z3tL/?accept=zip
 unzip index.html?accept=zip
+mv data/NetMedGPT.pt model
 rm index.html?accept=zip
-```
-
-3. Download model parameters
-```
-cd ../model
-wget ...
 ```
 
 
