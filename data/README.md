@@ -8,3 +8,6 @@ Please download it from the following link:
 
 After downloading, place the files in this folder:
 /NetMedGPT/data/
+
+
+https://cloud.uni-hamburg.de/public.php/dav/files/AoHLe9ARTC6Z3tL/?accept=zip
