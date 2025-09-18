@@ -8,7 +8,6 @@ data/*
 *.html
 *.sh
 *.arrow
-*.txt
 *.pkl
 *.pth
 *.log
