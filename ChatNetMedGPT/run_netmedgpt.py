@@ -128,6 +128,8 @@ def main():
         # for name, prob in zip(drug_names, top_probs):
         #     print(f"{name:20s}  (prob={prob:.4f})")
 
+    if not os.path.exists(user_response):
+        os.makedirs(user_response, exist_ok=True)
     drug_names_df = pd.DataFrame(drug_names, columns=["drug_name"])
     drug_names_df.to_csv(os.path.join(user_response,  "user_response.csv"), index = False)
     

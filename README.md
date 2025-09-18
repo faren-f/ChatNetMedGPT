@@ -13,7 +13,6 @@ conda env craete -f chatnetmedgpt.yml
 wget https://cloud.uni-hamburg.de/public.php/dav/files/AoHLe9ARTC6Z3tL/?accept=zip
 unzip index.html?accept=zip
 mv data/NetMedGPT.pt model
-mkdir data/user_response
 rm index.html?accept=zip
 ```
 
