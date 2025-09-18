@@ -2,7 +2,7 @@ print("[run_netmedgpt] __file__ =", __file__)
 
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "/home/bbc8731/NetMedGPT/")))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../")))
 
 import argparse
 import os
@@ -11,6 +11,8 @@ import pandas as pd
 import torch
 import torch.nn.functional as F
 from src.model_pretrain import *
+
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -28,7 +30,7 @@ def main():
 
     ##########################
     device = torch.device('cpu')
-    with open("/home/bbc8731/NetMedGPT/data/parameters.json", 'r') as file:
+    with open("data/parameters.json", 'r') as file:
         param = json.load(file)
     model_dir = param['files']['model_dir']
     data_dir = param['files']['data_dir']

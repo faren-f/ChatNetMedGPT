@@ -3,7 +3,9 @@ import re
 from helpers import *
 import os
 
-path = '/home/bbc8731/NetMedGPT/ChatNetMedGPT/'
+path = 'ChatNetMedGPT'
+
+print(os.system('pwd'))
 
 # A: Human text
 # B: pseudo-sentence
@@ -35,10 +37,10 @@ RELATION_SYNONYMS = {
 }
 
 # ========= PROMPTS =========
-with open(os.path.join(path, 'system_A2B.txt'), 'r') as f:
+with open('ChatNetMedGPT/system_A2B.txt', 'r') as f:
     SYSTEM_A_TO_B = f.read()
     
-with open(os.path.join(path,'system_B2A.txt'), 'r') as f:
+with open('ChatNetMedGPT/system_B2A.txt', 'r') as f:
     SYSTEM_B_TO_A = f.read()
     
 USER_A_TO_B_TEMPLATE = """Convert this A to B:
