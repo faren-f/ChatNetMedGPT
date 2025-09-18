@@ -12,6 +12,8 @@ conda env craete -f chatnetmedgpt.yml
 ```
 cd data
 wget https://cloud.uni-hamburg.de/public.php/dav/files/AoHLe9ARTC6Z3tL/?accept=zip
+unzip index.html?accept=zip
+rm unzip index.html?accept=zip
 ```
 
 3. Download model parameters
