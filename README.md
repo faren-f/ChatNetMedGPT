@@ -26,4 +26,4 @@ python ChatNetMedGPT/netmedgpt_llm.py --user_text "user_text"
 ```
 python ChatNetMedGPT/netmedgpt_llm.py --user_text "for diabetes with egfr mutation what is the best treatment and what are the adverse drug reactions"
 ```
-The output 
+The output is saved as a ```.csv``` file at ```data/user_response```.
