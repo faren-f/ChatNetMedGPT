@@ -1,5 +1,9 @@
 print("[run_netmedgpt] __file__ =", __file__)
 
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "/home/bbc8731/NetMedGPT/")))
+
 import argparse
 import os
 import json
@@ -24,15 +28,15 @@ def main():
 
     ##########################
     device = torch.device('cpu')
-    with open("/home/bbc8731/BioMedFormer/data/param/parameters.json", 'r') as file:
-        all_param = json.load(file)
-    model_dir = os.path.join(all_param['files']['data_dir'], 'saved_models/biomedformer_user')
-    attr_dir = all_param['files']['node_attr']
-    KG_dir = all_param['files']['KG_dir']
-    user_response = os.path.join(all_param['files']['data_dir'], 'user_response')
-    feat = torch.load(os.path.join(attr_dir, "embeddings_with_feat.pt"))
-    nodes = pd.read_csv(os.path.join(KG_dir, 'nodes.csv'), sep= ',')
-    edge = pd.read_csv(os.path.join(KG_dir, "edges.csv")) 
+    with open("/home/bbc8731/NetMedGPT/data/parameters.json", 'r') as file:
+        param = json.load(file)
+    model_dir = param['files']['model_dir']
+    data_dir = param['files']['data_dir']
+    data_dir = param['files']['data_dir']
+    user_response = os.path.join(param['files']['data_dir'], 'user_response')
+    feat = torch.load(os.path.join(data_dir, "embeddings_with_feat.pt"))
+    nodes = pd.read_csv(os.path.join(data_dir, 'nodes.csv'), sep= ',')
+    edge = pd.read_csv(os.path.join(data_dir, "edges.csv")) 
 
     mask_token = edge['z_index'].max() + 1
     vocab_size = mask_token + 1
@@ -55,7 +59,7 @@ def main():
     relation_mask_index = pd.concat([relation_index, mask_row], ignore_index=True)
 
     # load the model
-    tag = f"{model_dir}/biomedformer_atr_final_transductive_wl5_wpn30_dim300_head5_lencoder30_bs4000_lr0.0001_seed42_modelLastEpoch"
+    tag = f"{model_dir}/NetMedGPT"
     
     if len(tag) > 0:
         checkpoint_path = os.path.join(model_dir, f"{tag}.pt")
@@ -92,7 +96,7 @@ def main():
     # Treat --mask_index_question as an ABSOLUTE token position
     mask_pos = int(mask_index_question)
     
-    # Safety checks + helpful debug
+    # Safety check
     seq_len = sentence.size(1)
     if not (0 <= mask_pos < seq_len):
         raise IndexError(f"--mask_index_question {mask_pos} out of bounds; sequence length={seq_len}")

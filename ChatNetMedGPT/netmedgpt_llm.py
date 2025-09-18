@@ -1,3 +1,7 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "/home/bbc8731/NetMedGPT/")))
+
 import subprocess
 import argparse
 
@@ -80,7 +84,7 @@ sentence_str = ",".join(map(str, sentence_indices))
 
 # Build the command to call the second script
 cmd = [
-    "python", "run_netmedgpt.py",
+    "python", "/home/bbc8731/NetMedGPT/ChatNetMedGPT/run_netmedgpt.py",
     "--sentence", sentence_str,
     "--node_type", node_type,
     "--mask_index_question", str(mask_index_question)
