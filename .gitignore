@@ -14,7 +14,6 @@ data/*
 *.log
 *.safetensors
 *.png
-*.yml
 Result/
 AMiner/
 MetaPath2Vec/Result
