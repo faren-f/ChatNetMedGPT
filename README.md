@@ -1,12 +1,25 @@
 # NetMedGPT
 
 ## Prepare environment
-First clone the respositiy and use install the envinomtm
+1. First clone the respositiy and use install the envinomtm
 ```
 git clone https://github.com/faren-f/NetMedGPT.git
 cd NetMedGPT
 conda env craete -f chatnetmedgpt.yml
 ```
+
+2. Download the data
+```
+cd data
+wget https://cloud.uni-hamburg.de/public.php/dav/files/AoHLe9ARTC6Z3tL/?accept=zip
+```
+
+3. Download model parameters
+```
+cd ../model
+wget ...
+```
+
 
 ## Run ChatNetMedGPT
 To run the model and get the result use the command below
