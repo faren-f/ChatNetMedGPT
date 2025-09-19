@@ -9,7 +9,7 @@ hostname = "dev.chat.cosy.bio"
 host = f"{protocol}://{hostname}"
 api_key = "sk-45405987006a4a4d8b4deb9e7588c6bc"
 api_url = f"{host}/ollama/api/chat"
-MODEL_NAME = "gpt-oss:120b"
+MODEL_NAME = "gpt-oss:20b"
 B_MAX_TOKENS = 9
 
 headers = {
