@@ -1,7 +1,7 @@
 # NetMedGPT
 
 ## Prepare environment
-1. First clone the respositiy and use install the envinomtm
+1. First clone the repository and install the environment
 ```
 git clone https://github.com/faren-f/NetMedGPT.git
 cd NetMedGPT
