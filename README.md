@@ -5,7 +5,7 @@
 ```
 git clone https://github.com/faren-f/NetMedGPT.git
 cd NetMedGPT
-conda env craete -f chatnetmedgpt.yml
+conda env create -f chatnetmedgpt.yml
 ```
 
 2. Download the data and model parameters
