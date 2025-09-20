@@ -1,0 +1,40 @@
+# Core Python
+ipykernel
+jupyterlab
+
+# Scientific stack
+numpy
+pandas
+scipy
+scikit-learn
+
+# PyTorch ecosystem (Apple Silicon uses MPS backend instead of CUDA)
+torch==2.5.*
+torchvision
+torchaudio
+
+# NLP + Transformers
+transformers
+tokenizers
+datasets
+accelerate
+safetensors
+faiss-cpu
+
+# Utilities
+pyarrow
+tqdm
+requests
+pyyaml
+regex
+
+# --- FastAPI stack ---
+fastapi
+uvicorn[standard]          # ASGI server
+websockets                 # optional; Starlette handles WS, but this adds client/utils
+python-multipart           # form/file uploads if you need them
+sse-starlette              # SSE transport (useful for streaming & MCP over HTTP)
+
+# --- MCP (Model Context Protocol) ---
+mcp                        # official MCP Python SDK (server & client)
+fastapi-mcp                # expose FastAPI routes as MCP tools (auto-generates MCP server)
