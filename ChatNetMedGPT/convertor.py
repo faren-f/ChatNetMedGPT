@@ -1,4 +1,4 @@
-from helpers import send_chat, enforce_max_tokens, tokenize_b, looks_like_b_chain, revise_b
+from ChatNetMedGPT.helpers import send_chat, enforce_max_tokens, tokenize_b, looks_like_b_chain, revise_b
 import re
 import os
 
@@ -85,45 +85,6 @@ class ABConverter:
         b = b_line
         node_type = node_line
         
-        #########Pre-normalize A with a tiny dictionary check
-        GENE_SYMBOLS = None
-        GENE_SET = None
-        GENE_PATTERN = re.compile(r"\b[A-Za-z0-9]{3,8}\b")  # simple gene-like tokens
-        
-        CONFUSABLE_MAP = str.maketrans({
-            "o":"0","O":"0","l":"1","I":"1","S":"5","s":"5","B":"8","Z":"2","z":"2","e":"3","E":"3"
-        })
-        
-        def load_hgnc_symbols(path="hgnc_symbols.txt"):
-            global GENE_SYMBOLS, GENE_SET
-            with open(path) as f:
-                GENE_SYMBOLS = [line.strip().upper() for line in f if line.strip()]
-            GENE_SET = set(GENE_SYMBOLS)
-        
-        def normalize_gene_token(tok: str, cutoff=92):
-            u = tok.upper()
-            if u in GENE_SET:
-                return u
-            # try confusable normalization first
-            conf = u.translate(CONFUSABLE_MAP)
-            if conf in GENE_SET:
-                return conf
-            # fuzzy within small candidate space
-            cand = process.extractOne(u, GENE_SYMBOLS, scorer=fuzz.WRatio, score_cutoff=cutoff)
-            return cand[0] if cand else tok  # if no good match, leave as-is
-        
-        def normalize_A_text(a: str):
-            if GENE_SYMBOLS is None:
-                load_hgnc_symbols()
-            def repl(m):
-                tok = m.group(0)
-                # Heuristic: only normalize tokens that are mostly uppercase/digits
-                if sum(c.isupper() or c.isdigit() for c in tok) / len(tok) >= 0.75:
-                    return normalize_gene_token(tok)
-                return tok
-            # quick fix for the example disease misspelling
-            a = re.sub(r"\bsystemic\s+lapus\s+erythematosus\b", "systemic lupus erythematosus", a, flags=re.I)
-            return GENE_PATTERN.sub(repl, a)
 
         for _ in range(attempts):
             ok_len, b = enforce_max_tokens(b, self.max_tokens)
@@ -135,33 +96,6 @@ class ABConverter:
     
         # === last-resort repair ===
         tokens = tokenize_b(b)
-        tokens = sanitize_legacy_masks(tokens)
-    
-        # Ensure odd positions are valid relations
-        for i in range(len(tokens)):
-            if i % 2 == 1 and not is_valid_relation(tokens[i]):
-                tokens[i] = "indication"
-    
-        # Ensure exactly one MASK1
-        n1, n0, _ = count_masks(tokens)
-        if n1 == 0:
-            for i in range(0, len(tokens), 2):
-                if tokens[i] in ALLOWED_MASKS:
-                    tokens[i] = MASK_PRIMARY
-                    break
-            for i in range(0, len(tokens), 2):
-                if tokens[i] in ALLOWED_MASKS and tokens[i] != MASK_PRIMARY:
-                    tokens[i] = MASK_SECONDARY
-        elif n1 > 1:
-            seen = False
-            for i in range(0, len(tokens), 2):
-                if tokens[i] == MASK_PRIMARY:
-                    if not seen:
-                        seen = True
-                    else:
-                        tokens[i] = MASK_SECONDARY
-    
-        tokens = tokens[:B_MAX_TOKENS]
         b = " ".join(tokens)
         return b.strip(), node_type
 
