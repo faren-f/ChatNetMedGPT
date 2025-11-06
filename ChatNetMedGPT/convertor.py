@@ -1,6 +1,5 @@
-from helpers import send_chat, MODEL_NAME
+from helpers import send_chat, enforce_max_tokens, tokenize_b, looks_like_b_chain, revise_b
 import re
-from helpers import *
 import os
 
 path = os.system('pwd')

@@ -1,7 +1,6 @@
-import requests
 from typing import List, Tuple
-import re
-from convertor import *
+
+import requests
 
 # ========= SERVER CONFIG =========
 protocol = "https"
@@ -18,16 +17,22 @@ headers = {
 }
 
 ALLOWED_RELATIONS = {
-    'anatomy_anatomy', 'anatomy_protein_absent', 'anatomy_protein_present', 'bioprocess_bioprocess', 
-    'bioprocess_protein', 'cellcomp_cellcomp', 'cellcomp_protein', 'contraindication', 'disease_disease',
-    'disease_phenotype_negative', 'disease_phenotype_positive', 'disease_protein', 'drug_drug', 'drug_effect',
-    'drug_protein', 'exposure_bioprocess', 'exposure_cellcomp', 'exposure_disease', 'exposure_exposure', 
-    'exposure_molfunc', 'exposure_protein', 'indication', 'molfunc_molfunc', 'molfunc_protein','off-label use', 
-    'pathway_pathway', 'pathway_protein', 'phenotype_phenotype', 'phenotype_protein', 'protein_protein'
+    'anatomy_anatomy', 'anatomy_protein_absent', 'anatomy_protein_present', 'bioprocess_bioprocess',
+    'bioprocess_protein', 'cellcomp_cellcomp', 'cellcomp_protein', 'contraindication',
+    'disease_disease',
+    'disease_phenotype_negative', 'disease_phenotype_positive', 'disease_protein', 'drug_drug',
+    'drug_effect',
+    'drug_protein', 'exposure_bioprocess', 'exposure_cellcomp', 'exposure_disease',
+    'exposure_exposure',
+    'exposure_molfunc', 'exposure_protein', 'indication', 'molfunc_molfunc', 'molfunc_protein',
+    'off-label use',
+    'pathway_pathway', 'pathway_protein', 'phenotype_phenotype', 'phenotype_protein',
+    'protein_protein'
 }
 
-ALLOWED_NODE_TYPES = {"gene/protein", "drug", "effect/phenotype", "disease", "biological_process", 
-                 "molecular_function", "cellular_component", "exposure", "pathway", "anatomy"}
+ALLOWED_NODE_TYPES = {"gene/protein", "drug", "effect/phenotype", "disease", "biological_process",
+                      "molecular_function", "cellular_component", "exposure", "pathway", "anatomy"}
+
 
 # ========= LOW-LEVEL CHAT =========
 def send_chat(system: str, user: str, model: str = MODEL_NAME, stream: bool = False) -> str:
@@ -44,12 +49,15 @@ def send_chat(system: str, user: str, model: str = MODEL_NAME, stream: bool = Fa
     data = resp.json()
     return data["message"]["content"].strip()
 
+
 # ========= HELPERS =========
 def tokenize_b(s: str) -> List[str]:
     return s.strip().split()
 
+
 def is_valid_relation(tok: str) -> bool:
     return tok in ALLOWED_RELATIONS
+
 
 def looks_like_b_chain(tokens: List[str]) -> bool:
     if len(tokens) < 2:
@@ -63,9 +71,11 @@ def looks_like_b_chain(tokens: List[str]) -> bool:
                 return False
     return True
 
+
 def enforce_max_tokens(text: str, max_tokens: int = B_MAX_TOKENS) -> Tuple[bool, str]:
     toks = tokenize_b(text)
     return (len(toks) <= max_tokens, text.strip())
+
 
 def revise_b(previous_b: str, a_text: str, mask_error: str = "") -> str:
     system = f"""Revise the relation chain (format B) to meet ALL constraints:
