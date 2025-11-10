@@ -20,7 +20,7 @@ rm index.html?accept=zip
 ## Run ChatNetMedGPT
 To run the model and get the result use the command below
 ```
-python ChatNetMedGPT/netmedgpt_llm.py --user_text "user_text"
+python netmedgpt_llm.py --user_text "user_text"
 ```
 ```"user_text"``` is the user query. For example
 ```
