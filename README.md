@@ -3,8 +3,8 @@
 ## Prepare environment
 1. First clone the repository and install the environment
 ```
-git clone https://github.com/faren-f/NetMedGPT.git
-cd NetMedGPT
+git clone https://github.com/faren-f/ChatNetMedGPT.git
+cd ChatNetMedGPT
 conda env craete -f chatnetmedgpt.yml
 ```
 
