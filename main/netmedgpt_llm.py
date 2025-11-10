@@ -60,5 +60,4 @@ cmd = [
     "--mask_index_question", str(mask_index_question)
 ]
 
-print("Running:", " ".join(cmd))
 subprocess.run(cmd)

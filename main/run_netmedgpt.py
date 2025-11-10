@@ -1,5 +1,3 @@
-print("[run_netmedgpt] __file__ =", __file__)
-
 import sys
 import os
 import argparse
@@ -107,8 +105,6 @@ def main():
         os.makedirs(user_response, exist_ok=True)
     drug_names_df = pd.DataFrame(drug_names, columns=["drug_name"])
     drug_names_df.to_csv(os.path.join(user_response,  "user_response.csv"), index = False)
-    
-
     print("Output:", drug_names_df)
 
 
