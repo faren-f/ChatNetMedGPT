@@ -2,17 +2,14 @@ print("[run_netmedgpt] __file__ =", __file__)
 
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../")))
-
 import argparse
-import os
 import json
 import pandas as pd
 import torch
 import torch.nn.functional as F
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../")))
 from src.model_pretrain import *
-
-
 
 def main():
     parser = argparse.ArgumentParser()
@@ -22,18 +19,15 @@ def main():
     parser.add_argument("--mask_index_question", required=False, default="first", help="Which mask to use: 0-based index (e.g., 0,1,2) or 'first'/'last'. Default: first")
     
     args = parser.parse_args()
-    
     input = args.sentence
     node_type = args.node_type
-    output_file = args.output
     mask_index_question = args.mask_index_question
 
     ##########################
     device = torch.device('cpu')
-    with open("data/parameters.json", 'r') as file:
+    with open("../data/parameters.json", 'r') as file:
         param = json.load(file)
     model_dir = param['files']['model_dir']
-    data_dir = param['files']['data_dir']
     data_dir = param['files']['data_dir']
     user_response = os.path.join(param['files']['data_dir'], 'user_response')
     feat = torch.load(os.path.join(data_dir, "embeddings_with_feat.pt"))
@@ -42,16 +36,8 @@ def main():
 
     mask_token = edge['z_index'].max() + 1
     vocab_size = mask_token + 1
-    
     relation_type = list(edge['relation'].unique())
     node_types = list(nodes['node_type'].unique())
-    node_types_without_feat = ['biological_process',
-                               'molecular_function',
-                               'cellular_component',
-                               'exposure',
-                               'pathway',
-                               'anatomy']
-
     mask = ['mask']
     entity = node_types + relation_type + mask
 
@@ -61,44 +47,37 @@ def main():
     relation_mask_index = pd.concat([relation_index, mask_row], ignore_index=True)
 
     # load the model
-    tag = f"{model_dir}/NetMedGPT"
-    
-    if len(tag) > 0:
-        checkpoint_path = os.path.join(model_dir, f"{tag}.pt")
-        checkpoint = torch.load(checkpoint_path, map_location=device)
-        param = checkpoint['parameters']
-        state_dict = checkpoint['model_state_dict']
+    checkpoint_path = os.path.join(model_dir, "NetMedGPT.pt")
+    checkpoint = torch.load(checkpoint_path, map_location=device)
+    param = checkpoint['parameters']
+    state_dict = checkpoint['model_state_dict']
 
-        # instantiate the model
-        model = TransformerModel(
-            vocab_size,
-            param['hidden_channels'],
-            param['nhead'],
-            param['N_encoder_layers'],
-            (param['walk_length']*2)-1, #walk_length_with_relation
-            device=device,
-            feat = feat,
-            nodes = nodes,
-            entity = entity,
-            relation_mask_index = relation_mask_index,
-            pos_emb='fixed',
-        ).to(device)
-    
-        # load the model
-        model.load_state_dict(state_dict)
+    # instantiate the model
+    model = TransformerModel(
+        vocab_size,
+        param['hidden_channels'],
+        param['nhead'],
+        param['N_encoder_layers'],
+        (param['walk_length']*2)-1, #walk_length_with_relation
+        device=device,
+        feat = feat,
+        nodes = nodes,
+        entity = entity,
+        relation_mask_index = relation_mask_index,
+        pos_emb='fixed',
+    ).to(device)
+
+    # load the model
+    model.load_state_dict(state_dict)
 
     nodes_at_mask = nodes.loc[nodes['node_type'] == node_type,['node_index','node_name']].values
     node_ids_at_mask = torch.tensor(nodes_at_mask[:,0].astype(int)).to(device)
 
     input = [int(i) for i in input.split(',')]
     sentence = torch.tensor([input])
-    # mask_pos = int(mask_index_question)  # absolute position of the MASK
-
-
-    # Treat --mask_index_question as an ABSOLUTE token position
     mask_pos = int(mask_index_question)
     
-    # Safety check
+    # safety check
     seq_len = sentence.size(1)
     if not (0 <= mask_pos < seq_len):
         raise IndexError(f"--mask_index_question {mask_pos} out of bounds; sequence length={seq_len}")
@@ -123,28 +102,16 @@ def main():
         top_probs = top_probs.cpu().numpy()[0]
     
         drug_names = nodes_at_mask[top_idx, 1]   
-        drug_ids = nodes_at_mask[top_idx, 0] 
     
-        # for name, prob in zip(drug_names, top_probs):
-        #     print(f"{name:20s}  (prob={prob:.4f})")
-
     if not os.path.exists(user_response):
         os.makedirs(user_response, exist_ok=True)
     drug_names_df = pd.DataFrame(drug_names, columns=["drug_name"])
     drug_names_df.to_csv(os.path.join(user_response,  "user_response.csv"), index = False)
     
 
-    # print("Input:", input)
     print("Output:", drug_names_df)
 
 
 if __name__ == '__main__':
     main()
-
-##### example for runing in terminal:
-#### python /home/bbc8731/BioMedFormer/run_netmedgpt.py   --sentence "129405,129381,129405,129389,129405,129387,129405,129405,129405"   --node_type drug   --mask_index_question 2   --output results.csv
-
-
-#python netmedgpt_llm.py --user_text "for diabetes with egfr mutation what is the best treatment and what are the adverse drug reactions"
-
 

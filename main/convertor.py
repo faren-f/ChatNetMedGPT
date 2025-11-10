@@ -36,10 +36,10 @@ RELATION_SYNONYMS = {
 }
 
 # ========= PROMPTS =========
-with open('ChatNetMedGPT/system_A2B.txt', 'r') as f:
+with open('system_A2B.txt', 'r') as f:
     SYSTEM_A_TO_B = f.read()
     
-with open('ChatNetMedGPT/system_B2A.txt', 'r') as f:
+with open('system_B2A.txt', 'r') as f:
     SYSTEM_B_TO_A = f.read()
     
 USER_A_TO_B_TEMPLATE = """Convert this A to B:
@@ -170,7 +170,4 @@ class ABConverter:
         system = SYSTEM_B_TO_A
         user = USER_B_TO_A_TEMPLATE.format(text=text_b)
         return send_chat(system, user)
-
-
-
 
