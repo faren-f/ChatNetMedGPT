@@ -6,7 +6,7 @@ import os
 path = os.system('pwd')
 print(path)
 
-# A: Human text
+# A: text
 # B: pseudo-sentence
 # ========= CONVERSION SETTINGS =========
 B_MAX_TOKENS = 9
@@ -21,7 +21,6 @@ ALLOWED_RELATIONS = {
 ALLOWED_NODE_TYPES = {"gene/protein", "drug", "effect/phenotype", "disease", "biological_process", 
                  "molecular_function", "cellular_component", "exposure", "pathway", "anatomy"}
 
-
 # ==== relation vocabulary & synonyms ====
 RELATION_SYNONYMS = {
     "associated": "associate",
@@ -34,6 +33,10 @@ RELATION_SYNONYMS = {
     "adverse_effect": "drug_effect",
     "side_effect": "drug_effect",
 }
+
+MASK_PRIMARY = "MASK1"
+MASK_SECONDARY = "MASK0"
+ALLOWED_MASKS = {MASK_PRIMARY, MASK_SECONDARY}
 
 # ========= PROMPTS =========
 with open('system_A2B.txt', 'r') as f:
@@ -125,6 +128,18 @@ class ABConverter:
             # quick fix for the example disease misspelling
             a = re.sub(r"\bsystemic\s+lapus\s+erythematosus\b", "systemic lupus erythematosus", a, flags=re.I)
             return GENE_PATTERN.sub(repl, a)
+
+
+        def count_masks(tokens):
+            n1 = sum(t == MASK_PRIMARY for t in tokens)
+            n0 = sum(t == MASK_SECONDARY for t in tokens)
+            legacy = sum(t.lower() in {"[mask]", "mask", "<mask>"} for t in tokens)
+            return n1, n0, legacy
+        
+        def sanitize_legacy_masks(tokens):
+            # Convert any [mask]/mask/<mask> to MASK0 (secondary) for now
+            return [MASK_SECONDARY if t.lower() in {"[mask]", "mask", "<mask>"} else t for t in tokens]
+                
 
         for _ in range(attempts):
             ok_len, b = enforce_max_tokens(b, self.max_tokens)
