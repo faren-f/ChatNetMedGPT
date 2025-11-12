@@ -8,6 +8,7 @@ from convertor import *
 from helpers import *
 from sentence_preprocessing import *
 
+
 with open("../data/parameters.json", 'r') as file:
     param = json.load(file)
 data_dir = param['files']['data_dir']
