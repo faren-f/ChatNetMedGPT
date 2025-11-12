@@ -61,3 +61,6 @@ cmd = [
 ]
 
 subprocess.run(cmd)
+os._exit(0)
+
+

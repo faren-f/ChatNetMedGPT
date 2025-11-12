@@ -6,6 +6,7 @@ import pandas as pd
 import torch
 import torch.nn.functional as F
 
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../")))
 from src.model_pretrain import *
 
@@ -106,7 +107,6 @@ def main():
     drug_names_df = pd.DataFrame(drug_names, columns=["drug_name"])
     drug_names_df.to_csv(os.path.join(user_response,  "user_response.csv"), index = False)
     print("Output:", drug_names_df)
-
 
 if __name__ == '__main__':
     main()

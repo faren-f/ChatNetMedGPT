@@ -1,0 +1,44 @@
+name: chatnetmedgpt
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+
+dependencies:
+  # Core
+  - python=3.11
+  - pip
+  - ipykernel
+  - jupyterlab
+
+  # Numerics / data
+  - numpy
+  - pandas
+  - scipy
+  - scikit-learn
+  - pyarrow
+  - tqdm
+  - requests
+  - regex
+  - lxml
+  - pillow
+
+  # PyTorch for macOS (CPU/MPS; no CUDA)
+  - pytorch=2.5.*
+  - torchvision=0.20.*
+  - torchaudio=2.5.*
+
+  # HF / NLP (Conda where available)
+  - accelerate>=1.2
+  - transformers>=4.45
+  - datasets>=2.19
+  - sentence-transformers
+  - ipywidgets
+
+  # Metric learning
+  - pytorch-metric-learning
+
+  # pip-only or safer via pip on mac
+  - pip:
+      - huggingface-hub>=0.34,<1.0
+      - faiss-cpu>=1.7
