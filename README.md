@@ -5,7 +5,15 @@
 ```
 git clone https://github.com/faren-f/ChatNetMedGPT.git
 cd ChatNetMedGPT
-conda env create -f chatnetmedgpt.yml
+```
+For Linux:
+```
+conda env create -f chatnetmedgpt_linux.yml
+```
+
+For MAC:
+```
+conda env create -f chatnetmedgpt_mac.yml
 ```
 
 2. Download the data and model parameters
