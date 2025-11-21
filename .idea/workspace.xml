@@ -4,11 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a58b59ff-8db7-47de-b3f6-82690e66e417" name="Changes" comment="Refactor import paths and update data loading to use relative paths">
+    <list default="true" id="a58b59ff-8db7-47de-b3f6-82690e66e417" name="Changes" comment="Refactor sentence processing logic and update logging in server main">
+      <change afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docker-compose-dev.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main/sentence_preprocessing.py" beforeDir="false" afterPath="$PROJECT_DIR$/main/sentence_preprocessing.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/server_main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -103,7 +104,7 @@
       <workItem from="1762454220891" duration="4766000" />
       <workItem from="1762510530400" duration="4000" />
       <workItem from="1763630555226" duration="8172000" />
-      <workItem from="1763733990278" duration="1170000" />
+      <workItem from="1763733990278" duration="4926000" />
     </task>
     <task id="LOCAL-00001" summary="Implement FastAPI server and refactor netMedGpt integration">
       <option name="closed" value="true" />
@@ -121,7 +122,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762456616996</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Refactor sentence processing logic and update logging in server main">
+      <option name="closed" value="true" />
+      <created>1763735172190</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1763735172190</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -130,7 +139,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Implement FastAPI server and refactor netMedGpt integration" />
     <MESSAGE value="Refactor import paths and update data loading to use relative paths" />
-    <option name="LAST_COMMIT_MESSAGE" value="Refactor import paths and update data loading to use relative paths" />
+    <MESSAGE value="Refactor sentence processing logic and update logging in server main" />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactor sentence processing logic and update logging in server main" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
