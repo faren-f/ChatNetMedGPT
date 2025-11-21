@@ -1,7 +1,5 @@
 import requests
 from typing import List, Tuple
-import re
-from convertor import *
 
 # ========= SERVER CONFIG =========
 protocol = "https"

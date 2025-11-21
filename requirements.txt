@@ -1,5 +1,37 @@
-mcp[cli]==1.10.1
-openai==1.75.0
 python-dotenv
 ipykernel
 httpx
+# Core
+ipykernel
+jupyterlab
+
+# Numerics / Data
+numpy
+pandas
+scipy
+scikit-learn
+pyarrow
+tqdm
+requests
+regex
+lxml
+pillow
+
+# PyTorch (macOS CPU/MPS)
+torch==2.5.*
+torchvision==0.20.*
+torchaudio==2.5.*
+
+# HF / NLP
+accelerate>=1.2
+transformers>=4.45
+datasets>=2.19
+sentence-transformers
+ipywidgets
+
+# Metric learning
+pytorch-metric-learning
+
+# Pip-only
+huggingface-hub>=0.34,<1.0
+faiss-cpu>=1.7

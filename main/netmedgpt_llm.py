@@ -4,10 +4,12 @@ import json
 import subprocess
 import argparse
 
-from convertor import *
-from helpers import *
-from sentence_preprocessing import *
+import pandas as pd
 
+from main.convertor import ABConverter
+from main.helpers import tokenize_b
+from main.sentence_preprocessing import sentence_to_token_id, node_embedding, build_faiss_ip_index, \
+    search_topk
 
 with open("../data/parameters.json", 'r') as file:
     param = json.load(file)

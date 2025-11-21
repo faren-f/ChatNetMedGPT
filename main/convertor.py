@@ -1,7 +1,7 @@
-from helpers import send_chat
 import re
-from helpers import *
-import os
+
+from main.helpers import looks_like_b_chain, tokenize_b, enforce_max_tokens, revise_b, \
+    is_valid_relation, send_chat
 
 # A: text
 # B: pseudo-sentence
@@ -36,10 +36,10 @@ MASK_SECONDARY = "MASK0"
 ALLOWED_MASKS = {MASK_PRIMARY, MASK_SECONDARY}
 
 # ========= PROMPTS =========
-with open('system_A2B.txt', 'r') as f:
+with open('main/system_A2B.txt', 'r') as f:
     SYSTEM_A_TO_B = f.read()
     
-with open('system_B2A.txt', 'r') as f:
+with open('main/system_B2A.txt', 'r') as f:
     SYSTEM_B_TO_A = f.read()
     
 USER_A_TO_B_TEMPLATE = """Convert this A to B:
@@ -85,46 +85,6 @@ class ABConverter:
         
         b = b_line
         node_type = node_line
-        
-        #########Pre-normalize A with a tiny dictionary check
-        GENE_SYMBOLS = None
-        GENE_SET = None
-        GENE_PATTERN = re.compile(r"\b[A-Za-z0-9]{3,8}\b")  # simple gene-like tokens
-        
-        CONFUSABLE_MAP = str.maketrans({
-            "o":"0","O":"0","l":"1","I":"1","S":"5","s":"5","B":"8","Z":"2","z":"2","e":"3","E":"3"
-        })
-        
-        def load_hgnc_symbols(path="hgnc_symbols.txt"):
-            global GENE_SYMBOLS, GENE_SET
-            with open(path) as f:
-                GENE_SYMBOLS = [line.strip().upper() for line in f if line.strip()]
-            GENE_SET = set(GENE_SYMBOLS)
-        
-        def normalize_gene_token(tok: str, cutoff=92):
-            u = tok.upper()
-            if u in GENE_SET:
-                return u
-            # try confusable normalization first
-            conf = u.translate(CONFUSABLE_MAP)
-            if conf in GENE_SET:
-                return conf
-            # fuzzy within small candidate space
-            cand = process.extractOne(u, GENE_SYMBOLS, scorer=fuzz.WRatio, score_cutoff=cutoff)
-            return cand[0] if cand else tok  # if no good match, leave as-is
-        
-        def normalize_A_text(a: str):
-            if GENE_SYMBOLS is None:
-                load_hgnc_symbols()
-            def repl(m):
-                tok = m.group(0)
-                # Heuristic: only normalize tokens that are mostly uppercase/digits
-                if sum(c.isupper() or c.isdigit() for c in tok) / len(tok) >= 0.75:
-                    return normalize_gene_token(tok)
-                return tok
-            # quick fix for the example disease misspelling
-            a = re.sub(r"\bsystemic\s+lapus\s+erythematosus\b", "systemic lupus erythematosus", a, flags=re.I)
-            return GENE_PATTERN.sub(repl, a)
 
 
         def count_masks(tokens):
