@@ -46,68 +46,52 @@ def sentence_to_snake(b: str,
 def sentence_to_token_id(sentence, mask_token, relation_index):
     # convert sentence to snake_case form
     sentence = sentence_to_snake(sentence)
-    sentence = sentence.split()
-    
-    # sentence_indices = [mask_token]*len(sentence) 
-    # all_indeces = list(np.arange(0,len(sentence))) # first mask token for all of them
+    tokens = sentence.split()
 
-    sentence_indices = [mask_token]*9 
-    all_indeces = list(np.arange(0,9)) # first mask token for all of them
-    
-    # identify the token of all the relations
+    # keep original 9-length vector of mask_token
+    sentence_indices = [mask_token] * 9
+
+    # relation -> z_index mapping
     rel2z = dict(zip(relation_index["relation"], relation_index["z_index"]))
-    
-    # find the index of the of the relations in the pseudo-sentence
-    relation_token_index = [
-        {"index": i, "relation_name": tok, "token": rel2z[tok]}
-        for i, tok in enumerate(sentence)
-        if tok in rel2z
-    ]
-    
-    relation_token_index_df = pd.DataFrame(relation_token_index, columns=["index", "relation_name", "token"])
-    # print(f'relation_token_index_df: {relation_token_index_df}')
-    
-    # substitute index of relations in the sentence
-    for i, pos in zip(relation_token_index_df['index'], relation_token_index_df['token']):
-        sentence_indices[i] = pos
-    
-    # print(f'sentence_indices: {sentence_indices}')
-    
-    # remove relation indices from the sentence to find the tokens of nodes
-    remaining_indices = list(set(all_indeces) - set(relation_token_index_df['index']))
-    # print(f'remaining_indices: {remaining_indices}')
-    
-    ##### remove the indices of masks from the sentence
-    mask_indices = []
-    
-    for tok in ['mask1', 'mask0']:
-        try:
-            mask_indices.append([i for i, x in enumerate(sentence) if x == tok][0])
-        except:
-            pass
-    
-    # print(f'mask_indices: {mask_indices}')
-    mask_index_question = mask_indices[0] # The model only prioritize nodes for mask1, so we need to know its index 
-    
-    # remove mask tokensfrom the sentence to only remain node tokens
-    remaining_indices = list(set(remaining_indices) - set(mask_indices))
-    # print(f'remaining_indices:{remaining_indices}')
-    
-    # remove masks from the sentence
-    set_sentence = set(sentence)- {'mask0','mask1'}
-    
-    # remove relations from the remaning sentence to keep only node_names
-    set_sentence = set_sentence-set(relation_token_index_df['relation_name'])
-    
-    list_nodes_sentence = list(set_sentence)
-    list_nodes_sentence
-    
-    node_indices = []
-    for tok in list_nodes_sentence:
-        node_indices.append([i for i, x in enumerate(sentence) if x == tok][0])
-    
-    # print(f'node_indices: {node_indices}')
-    return(list_nodes_sentence, node_indices, sentence_indices, mask_index_question)
+    relation_names = set(rel2z.keys())
+
+    # We collect everything in ONE pass
+    node_pos = {}             # token -> first index
+    mask_index_question = None  # prefer mask1 over mask0
+
+    for i, tok in enumerate(tokens):
+        # relations: directly write z_index into sentence_indices
+        if tok in rel2z:
+            if i < len(sentence_indices):  # safety if len(tokens) > 9
+                sentence_indices[i] = rel2z[tok]
+
+        # masks: remember first mask1, otherwise first mask0
+        elif tok == "mask1":
+            if mask_index_question is None:
+                mask_index_question = i
+        elif tok == "mask0":
+            if mask_index_question is None:
+                mask_index_question = i
+
+        # candidate node: remember first occurrence
+        elif tok not in node_pos:
+            node_pos[tok] = i
+
+    # Remove masks and relations from node set
+    node_pos.pop("mask0", None)
+    node_pos.pop("mask1", None)
+    for rel in relation_names:
+        node_pos.pop(rel, None)
+
+    # Build return lists
+    list_nodes_sentence = list(node_pos.keys())           # order: first appearance in sentence
+    node_indices = [node_pos[tok] for tok in list_nodes_sentence]
+
+    if mask_index_question is None:
+        # original code would crash if no mask was found; keep similar behaviour
+        raise ValueError("No 'mask1' or 'mask0' found in sentence")
+
+    return list_nodes_sentence, node_indices, sentence_indices, mask_index_question
 
 ################################################################################################################
 # 3) embed the nodes into the embedding space 

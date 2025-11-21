@@ -39,8 +39,9 @@ app = FastAPI(lifespan=lifespan)
 
 @app.get("/chat/")
 def chat(user_text: Union[str, None] = "for diabetes with egfr mutation what is the best treatment and what are the adverse drug reactions"):
+    LOG.info(user_text)
     sentence, node_type = conv.a_to_b(user_text)
-    logging.info(f"A:  {user_text} B: {sentence} (tokens={len(tokenize_b(sentence))}), node_type: {node_type}")
+    LOG.info(f"A:  {user_text} B: {sentence} (tokens={len(tokenize_b(sentence))}), node_type: {node_type}")
 
     all_node_names = state['all_node_names']
     node_index = state['node_index']
@@ -52,12 +53,12 @@ def chat(user_text: Union[str, None] = "for diabetes with egfr mutation what is 
 
     list_nodes_sentence, node_indices, sentence_indices, mask_index_question = sentence_to_token_id(
         sentence, mask_token, relation_index)
-    print("Mask index question from sentence_to_token_id:", mask_index_question)
+    LOG.info("Mask index question from sentence_to_token_id:", mask_index_question)
 
     attr_nodes = node_embedding(list_nodes_sentence)
 
     hits_per_query = search_topk(node_index, attr_nodes, all_node_names, k=1)
-
+    LOG.info("Nearest neighbors found:" + str(hits_per_query))
     neighbor_indices = []
     neighbors = []
     for i, hits in enumerate(hits_per_query):
