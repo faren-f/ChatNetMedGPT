@@ -47,12 +47,16 @@ def sentence_to_token_id(sentence, mask_token, relation_index):
     sentence = sentence_to_snake(sentence)
     tokens = sentence.split()
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 47500c8 (Refactor sentence processing logic and update logging in server main)
     # keep original 9-length vector of mask_token
     sentence_indices = [mask_token] * 9
 
     # relation -> z_index mapping
     rel2z = dict(zip(relation_index["relation"], relation_index["z_index"]))
+<<<<<<< HEAD
 
 ###### check later
     # all_indeces = list(np.arange(0,9)) # first mask token for all of them
@@ -111,6 +115,8 @@ def sentence_to_token_id(sentence, mask_token, relation_index):
 
     ###### check later ta enja
 
+=======
+>>>>>>> 47500c8 (Refactor sentence processing logic and update logging in server main)
     relation_names = set(rel2z.keys())
 
     # We collect everything in ONE pass
