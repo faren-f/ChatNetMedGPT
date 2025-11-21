@@ -44,6 +44,7 @@ def inferenceNetMedGpt(input, node_type, mask_index_question, nodes, edge, model
         top_idx = top_idx.cpu().numpy()[0]  # shape (N_top,)
 
         drug_names = nodes_at_mask[top_idx, 1]
+<<<<<<< HEAD
 
     del sentence, output, logits, probs, top_probs, top_idx, node_ids_at_mask
 
@@ -51,3 +52,6 @@ def inferenceNetMedGpt(input, node_type, mask_index_question, nodes, edge, model
         torch.cuda.empty_cache()
 
     return drug_names
+=======
+    return drug_names
+>>>>>>> 75dab57 (init)

@@ -1,12 +1,19 @@
+<<<<<<< HEAD
 import json
+=======
+>>>>>>> 75dab57 (init)
 import logging
 from contextlib import asynccontextmanager
 from typing import Union
 
+<<<<<<< HEAD
 from aiocache import Cache
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+=======
+from fastapi import FastAPI
+>>>>>>> 75dab57 (init)
 
 from main.convertor import ABConverter
 from main.helpers import tokenize_b
@@ -16,6 +23,7 @@ from src.server.model_inference import inferenceNetMedGpt
 from src.server.model_loader import load_model
 
 conv = ABConverter()
+<<<<<<< HEAD
 cache = Cache(Cache.MEMORY, namespace="chat")
 LOG = logging.getLogger(__name__)
 
@@ -31,6 +39,12 @@ class DrugResponse(BaseModel):
     sentence: str
 
 
+=======
+LOG = logging.getLogger(__name__)
+
+
+state = {}
+>>>>>>> 75dab57 (init)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     LOG.info("LIFESPACE START")
@@ -43,12 +57,16 @@ async def lifespan(app: FastAPI):
     state['nodes'] = nodes
 
     state['model'] = load_model(edges, nodes, mask_token)
+<<<<<<< HEAD
 
     await cache.clear()
+=======
+>>>>>>> 75dab57 (init)
     LOG.info("LIFESPACE Loaded")
     yield
     # --- shutdown ---
     state.clear()
+<<<<<<< HEAD
     await cache.clear()
     LOG.info("LIFESPACE END")
 
@@ -95,6 +113,17 @@ async def chat(user_text: Union[
     sentence, node_type = conv.a_to_b(user_text)
     LOG.info(
         f"A:  {user_text} B: {sentence} (tokens={len(tokenize_b(sentence))}), node_type: {node_type}")
+=======
+    LOG.info("LIFESPACE END")
+
+app = FastAPI(lifespan=lifespan)
+
+
+@app.get("/chat/")
+def chat(user_text: Union[str, None] = "for diabetes with egfr mutation what is the best treatment and what are the adverse drug reactions"):
+    sentence, node_type = conv.a_to_b(user_text)
+    logging.info(f"A:  {user_text} B: {sentence} (tokens={len(tokenize_b(sentence))}), node_type: {node_type}")
+>>>>>>> 75dab57 (init)
 
     all_node_names = state['all_node_names']
     node_index = state['node_index']
@@ -106,12 +135,20 @@ async def chat(user_text: Union[
 
     list_nodes_sentence, node_indices, sentence_indices, mask_index_question = sentence_to_token_id(
         sentence, mask_token, relation_index)
+<<<<<<< HEAD
     LOG.info("Mask index question from sentence_to_token_id:", mask_index_question)
+=======
+    print("Mask index question from sentence_to_token_id:", mask_index_question)
+>>>>>>> 75dab57 (init)
 
     attr_nodes = node_embedding(list_nodes_sentence)
 
     hits_per_query = search_topk(node_index, attr_nodes, all_node_names, k=1)
+<<<<<<< HEAD
     LOG.info("Nearest neighbors found:" + str(hits_per_query))
+=======
+
+>>>>>>> 75dab57 (init)
     neighbor_indices = []
     neighbors = []
     for i, hits in enumerate(hits_per_query):
@@ -124,6 +161,7 @@ async def chat(user_text: Union[
     for i, index in zip(node_indices, neighbor_indices):
         sentence_indices[i] = index
 
+<<<<<<< HEAD
     sentence_str = ",".join(map(str, sentence_indices))
 
     cached_value = await cache.get(sentence_str)
@@ -141,3 +179,9 @@ async def chat(user_text: Union[
     await cache.set(user_text, response, ttl=3600)
     await cache.set(sentence_str, response, ttl=3600)
     return response
+=======
+    # Convert indices list to comma-separated string
+    sentence_str = ",".join(map(str, sentence_indices))
+    drug_names = inferenceNetMedGpt(sentence_str, node_type, str(mask_index_question), nodes, edges, model)
+    return {"drugs": drug_names.tolist()}
+>>>>>>> 75dab57 (init)

@@ -8,9 +8,18 @@ import subprocess
 import argparse
 import pandas as pd
 
+<<<<<<< HEAD
 from main.convertor import ABConverter
 from main.helpers import tokenize_b
 from main.sentence_preprocessing import sentence_to_token_id, node_embedding, build_faiss_ip_index, search_topk
+=======
+import pandas as pd
+
+from main.convertor import ABConverter
+from main.helpers import tokenize_b
+from main.sentence_preprocessing import sentence_to_token_id, node_embedding, build_faiss_ip_index, \
+    search_topk
+>>>>>>> 75dab57 (init)
 
 with open("../data/parameters.json", 'r') as file:
     param = json.load(file)

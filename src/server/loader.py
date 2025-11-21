@@ -15,4 +15,13 @@ def load_data():
     all_node_names = nodes_snake['node_name']
     index = build_faiss_ip_index(emb_nodes)
 
+<<<<<<< HEAD
     return all_node_names, index, edges, relation_index, mask_token, nodes
+=======
+    return all_node_names, index, edges, relation_index, mask_token, nodes
+
+def load_model_parameters():
+    feat = torch.load("data/embeddings_with_feat.pt")
+
+    return feat, data_dir
+>>>>>>> 75dab57 (init)
