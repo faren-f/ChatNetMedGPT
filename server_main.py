@@ -9,11 +9,15 @@ from typing import Union
 <<<<<<< HEAD
 from aiocache import Cache
 from fastapi import FastAPI
+<<<<<<< HEAD
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 =======
 from fastapi import FastAPI
 >>>>>>> 75dab57 (init)
+=======
+from pydantic import BaseModel
+>>>>>>> 57e2b79 (Add docker-compose configuration and enhance FastAPI server with improved response model and metadata)
 
 from main.convertor import ABConverter
 from main.helpers import tokenize_b
@@ -44,7 +48,17 @@ LOG = logging.getLogger(__name__)
 
 
 state = {}
+<<<<<<< HEAD
 >>>>>>> 75dab57 (init)
+=======
+
+class DrugResponse(BaseModel):
+    """Response model returning a list of recommended drug names."""
+    drugs: list[str]
+    node_type: str
+    sentence: str
+
+>>>>>>> 57e2b79 (Add docker-compose configuration and enhance FastAPI server with improved response model and metadata)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     LOG.info("LIFESPACE START")
@@ -116,11 +130,32 @@ async def chat(user_text: Union[
 =======
     LOG.info("LIFESPACE END")
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(
+    title="ChatNetMedGPT API",
+    description=(
+        "API for graph-based retrieval and recommendation of drug candidates "
+        "for clinical questions using the NetMedGPT model."
+    ),
+    version="0.1.0",
+    contact={
+        "name": "Farzaneh firoozbakht, Simon Süwer",
+        "email": "farzaneh.firoozbakht@uni-hamburg.de",
+    },
+    lifespan=lifespan,
+)
 
-
-@app.get("/chat/")
-def chat(user_text: Union[str, None] = "for diabetes with egfr mutation what is the best treatment and what are the adverse drug reactions"):
+@app.get(
+    "/chat/",
+    response_model=DrugResponse,
+    summary="Recommend drugs for a clinical question",
+    description=(
+        "Takes a free-text clinical question, maps it to the internal graph "
+        "representation, and returns a list of recommended drug names inferred "
+        "by the NetMedGPT model."
+    ),
+    tags=["drug-recommendation"],
+)
+def chat(user_text: Union[str, None] = "for diabetes with egfr mutation what is the best treatment and what are the adverse drug reactions") -> DrugResponse:
     LOG.info(user_text)
     sentence, node_type = conv.a_to_b(user_text)
 <<<<<<< HEAD
@@ -196,5 +231,9 @@ def chat(user_text: Union[str, None] = "for diabetes with egfr mutation what is 
     # Convert indices list to comma-separated string
     sentence_str = ",".join(map(str, sentence_indices))
     drug_names = inferenceNetMedGpt(sentence_str, node_type, str(mask_index_question), nodes, edges, model)
+<<<<<<< HEAD
     return {"drugs": drug_names.tolist()}
 >>>>>>> 75dab57 (init)
+=======
+    return DrugResponse(drugs=drug_names.tolist(), node_type=node_type, sentence=sentence)
+>>>>>>> 57e2b79 (Add docker-compose configuration and enhance FastAPI server with improved response model and metadata)

@@ -4,12 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a58b59ff-8db7-47de-b3f6-82690e66e417" name="Changes" comment="Refactor sentence processing logic and update logging in server main">
-      <change afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docker-compose-dev.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="a58b59ff-8db7-47de-b3f6-82690e66e417" name="Changes" comment="Add Dockerfile and docker-compose for FastAPI server setup; update .gitignore and requirements">
+      <change afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/server_main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,7 +47,7 @@
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
     "git-widget-placeholder": "feature/server__fastapi__mcp",
     "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "/Users/simon/Documents/git/llm/ChatNetMedGPT/src",
+    "last_opened_file_path": "/Users/simon/Documents/git/llm/ChatNetMedGPT",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -61,6 +60,7 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/src" />
       <recent name="$PROJECT_DIR$/ChatNetMedGPT" />
     </key>
@@ -104,7 +104,7 @@
       <workItem from="1762454220891" duration="4766000" />
       <workItem from="1762510530400" duration="4000" />
       <workItem from="1763630555226" duration="8172000" />
-      <workItem from="1763733990278" duration="4926000" />
+      <workItem from="1763733990278" duration="10060000" />
     </task>
     <task id="LOCAL-00001" summary="Implement FastAPI server and refactor netMedGpt integration">
       <option name="closed" value="true" />
@@ -130,7 +130,15 @@
       <option name="project" value="LOCAL" />
       <updated>1763735172190</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Add Dockerfile and docker-compose for FastAPI server setup; update .gitignore and requirements">
+      <option name="closed" value="true" />
+      <created>1763739044681</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1763739044681</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -140,14 +148,15 @@
     <MESSAGE value="Implement FastAPI server and refactor netMedGpt integration" />
     <MESSAGE value="Refactor import paths and update data loading to use relative paths" />
     <MESSAGE value="Refactor sentence processing logic and update logging in server main" />
-    <option name="LAST_COMMIT_MESSAGE" value="Refactor sentence processing logic and update logging in server main" />
+    <MESSAGE value="Add Dockerfile and docker-compose for FastAPI server setup; update .gitignore and requirements" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add Dockerfile and docker-compose for FastAPI server setup; update .gitignore and requirements" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/server_main.py</url>
-          <line>63</line>
+          <line>92</line>
           <option name="timeStamp" value="6" />
         </line-breakpoint>
       </breakpoints>

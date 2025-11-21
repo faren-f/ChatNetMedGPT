@@ -1,0 +1,18 @@
+services:
+  chatnetmedgpt-api:
+    image: gitlab.cosy.bio:5050/simonsuewer/chatnetmedgpt-api
+    volumes:
+      - ./chatnetmedgpt/api/data:/app/data
+      - ./chatnetmedgpt/api/model:/app/model
+    ports:
+      - "8145:8000"
+    restart: on-failure
+  chatnetmedgpt-frontend:
+    image: gitlab.cosy.bio:5050/simonsuewer/biomedformerui/ui:latest
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+    ports:
+      - "8144:4000"
+    volumes:
+      - ./biomedformer-data/:/app/browser/public/data
+    restart: on-failure
