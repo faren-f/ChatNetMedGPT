@@ -248,8 +248,14 @@ def build_faiss_ip_index(all_node_emb):
 
 def search_topk(index, query_emb, node_names, k=5):
     """
+<<<<<<< HEAD:main_2/sentence_preprocessing.py
     query_emb: [Q, D]  (one or many queries)
     Returns top-k neighbors for each query.
+=======
+    query_emb: [Q, D] torch tensor
+    Returns: list of length Q; each is list of (name, cosine, id)
+    #TODO SPPED UP
+>>>>>>> fc63c88 (Optimize sentence preprocessing by improving tensor handling and normalization):main/sentence_preprocessing.py
     """
     with torch.no_grad():
         q = query_emb.detach()
@@ -257,7 +263,10 @@ def search_topk(index, query_emb, node_names, k=5):
         q_cpu = q.to(device="cpu", dtype=torch.float32, non_blocking=True).contiguous()
         q_np = q_cpu.numpy()
     sims, ids = index.search(q_np, k)  # sims: [Q, k], ids: [Q, k]
+<<<<<<< HEAD:main_2/sentence_preprocessing.py
 
+=======
+>>>>>>> fc63c88 (Optimize sentence preprocessing by improving tensor handling and normalization):main/sentence_preprocessing.py
     results = []
     for qi in range(q.shape[0]):
         hits = []
