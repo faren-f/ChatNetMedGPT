@@ -153,10 +153,14 @@ def search_topk(
     """
     query_emb: [Q, D] torch tensor
     Returns: list of length Q; each is list of (name, cosine, id)
+    #TODO SPPED UP
     """
     with torch.no_grad():
-        q = F.normalize(query_emb.detach().cpu().float(), dim=1).numpy().astype('float32', copy=False)
-    sims, ids = index.search(q, k)  # sims: [Q, k], ids: [Q, k]
+        q = query_emb.detach()
+        q = F.normalize(q, dim=1)
+        q_cpu = q.to(device="cpu", dtype=torch.float32, non_blocking=True).contiguous()
+        q_np = q_cpu.numpy()
+    sims, ids = index.search(q_np, k)  # sims: [Q, k], ids: [Q, k]
     results = []
     for qi in range(q.shape[0]):
         hits = []
