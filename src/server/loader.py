@@ -16,8 +16,3 @@ def load_data():
     index = build_faiss_ip_index(emb_nodes)
 
     return all_node_names, index, edges, relation_index, mask_token, nodes
-
-def load_model_parameters():
-    feat = torch.load("data/embeddings_with_feat.pt")
-
-    return feat, data_dir

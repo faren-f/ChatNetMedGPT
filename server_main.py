@@ -5,6 +5,7 @@ from typing import Union
 
 from aiocache import Cache
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from main.convertor import ABConverter
@@ -25,6 +26,7 @@ class DrugResponse(BaseModel):
     """Response model returning a list of recommended drug names."""
     drugs: list[str]
     neighbors: list[str]
+    list_nodes_sentence: list[str]
     node_type: str
     sentence: str
 
@@ -66,6 +68,12 @@ app = FastAPI(
     root_path_in_servers=False,
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get(
     "/chat",
@@ -128,7 +136,8 @@ async def chat(user_text: Union[
     response = DrugResponse(drugs=drug_names.tolist(),
                             node_type=node_type,
                             neighbors=neighbors,
+                            list_nodes_sentence=list_nodes_sentence,
                             sentence=sentence)
-    await cache.set(user_text, response, ttl=120)
-    await cache.set(sentence_str, response, ttl=120)
+    await cache.set(user_text, response, ttl=3600)
+    await cache.set(sentence_str, response, ttl=3600)
     return response
