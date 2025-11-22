@@ -16,6 +16,7 @@ def load_data():
     index = build_faiss_ip_index(emb_nodes)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     return all_node_names, index, edges, relation_index, mask_token, nodes
 =======
     return all_node_names, index, edges, relation_index, mask_token, nodes
@@ -25,3 +26,6 @@ def load_model_parameters():
 
     return feat, data_dir
 >>>>>>> 75dab57 (init)
+=======
+    return all_node_names, index, edges, relation_index, mask_token, nodes
+>>>>>>> a91bbff (Enhance FastAPI server by adding CORS middleware and updating response model to include list of nodes in sentences)

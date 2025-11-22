@@ -17,6 +17,9 @@ from typing import Union
 from aiocache import Cache
 from fastapi import FastAPI
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> a91bbff (Enhance FastAPI server by adding CORS middleware and updating response model to include list of nodes in sentences)
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 =======
@@ -128,6 +131,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+<<<<<<< HEAD
 
 @app.get(
     "/chat",
@@ -171,6 +175,8 @@ app = FastAPI(
     root_path_in_servers=False,
 )
 
+=======
+>>>>>>> a91bbff (Enhance FastAPI server by adding CORS middleware and updating response model to include list of nodes in sentences)
 
 @app.get(
     "/chat",
@@ -288,8 +294,9 @@ async def chat(user_text: Union[
     response = DrugResponse(drugs=drug_names.tolist(),
                             node_type=node_type,
                             neighbors=neighbors,
+                            list_nodes_sentence=list_nodes_sentence,
                             sentence=sentence)
-    await cache.set(user_text, response, ttl=120)
-    await cache.set(sentence_str, response, ttl=120)
+    await cache.set(user_text, response, ttl=3600)
+    await cache.set(sentence_str, response, ttl=3600)
     return response
 >>>>>>> e329b5c (Enhance FastAPI server with caching support and update response model to include neighbors)
