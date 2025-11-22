@@ -1,7 +1,9 @@
+import json
 import logging
 from contextlib import asynccontextmanager
 from typing import Union
 
+from aiocache import Cache
 from fastapi import FastAPI
 from pydantic import BaseModel
 
@@ -13,16 +15,19 @@ from src.server.model_inference import inferenceNetMedGpt
 from src.server.model_loader import load_model
 
 conv = ABConverter()
+cache = Cache(Cache.MEMORY, namespace="chat")
 LOG = logging.getLogger(__name__)
 
-
 state = {}
+
 
 class DrugResponse(BaseModel):
     """Response model returning a list of recommended drug names."""
     drugs: list[str]
+    neighbors: list[str]
     node_type: str
     sentence: str
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -36,11 +41,15 @@ async def lifespan(app: FastAPI):
     state['nodes'] = nodes
 
     state['model'] = load_model(edges, nodes, mask_token)
+
+    await cache.clear()
     LOG.info("LIFESPACE Loaded")
     yield
     # --- shutdown ---
     state.clear()
+    await cache.clear()
     LOG.info("LIFESPACE END")
+
 
 app = FastAPI(
     title="ChatNetMedGPT API",
@@ -54,23 +63,30 @@ app = FastAPI(
         "email": "farzaneh.firoozbakht@uni-hamburg.de",
     },
     lifespan=lifespan,
+    root_path_in_servers=False,
 )
 
+
 @app.get(
-    "/chat/",
+    "/chat",
     response_model=DrugResponse,
     summary="Recommend drugs for a clinical question",
     description=(
-        "Takes a free-text clinical question, maps it to the internal graph "
-        "representation, and returns a list of recommended drug names inferred "
-        "by the NetMedGPT model."
+            "Takes a free-text clinical question, maps it to the internal graph "
+            "representation, and returns a list of recommended drug names inferred "
+            "by the NetMedGPT model."
     ),
     tags=["drug-recommendation"],
 )
-def chat(user_text: Union[str, None] = "for diabetes with egfr mutation what is the best treatment and what are the adverse drug reactions") -> DrugResponse:
+async def chat(user_text: Union[
+    str, None] = "for diabetes with egfr mutation what is the best treatment and what are the adverse drug reactions") -> DrugResponse:
     LOG.info(user_text)
+    cached_value = await cache.get(user_text)
+    if cached_value is not None:
+        return cached_value
     sentence, node_type = conv.a_to_b(user_text)
-    LOG.info(f"A:  {user_text} B: {sentence} (tokens={len(tokenize_b(sentence))}), node_type: {node_type}")
+    LOG.info(
+        f"A:  {user_text} B: {sentence} (tokens={len(tokenize_b(sentence))}), node_type: {node_type}")
 
     all_node_names = state['all_node_names']
     node_index = state['node_index']
@@ -100,7 +116,19 @@ def chat(user_text: Union[str, None] = "for diabetes with egfr mutation what is 
     for i, index in zip(node_indices, neighbor_indices):
         sentence_indices[i] = index
 
-    # Convert indices list to comma-separated string
     sentence_str = ",".join(map(str, sentence_indices))
-    drug_names = inferenceNetMedGpt(sentence_str, node_type, str(mask_index_question), nodes, edges, model)
-    return DrugResponse(drugs=drug_names.tolist(), node_type=node_type, sentence=sentence)
+
+    cached_value = await cache.get(sentence_str)
+    if cached_value is not None:
+        return json.loads(sentence_str)
+
+    # Convert indices list to comma-separated string
+    drug_names = inferenceNetMedGpt(sentence_str, node_type, str(mask_index_question), nodes, edges,
+                                    model)
+    response = DrugResponse(drugs=drug_names.tolist(),
+                            node_type=node_type,
+                            neighbors=neighbors,
+                            sentence=sentence)
+    await cache.set(user_text, response, ttl=120)
+    await cache.set(sentence_str, response, ttl=120)
+    return response
