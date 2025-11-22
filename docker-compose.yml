@@ -8,9 +8,7 @@ services:
       - "8145:8000"
     restart: on-failure
   chatnetmedgpt-frontend:
-    image: gitlab.cosy.bio:5050/simonsuewer/biomedformerui/ui:latest
-    labels:
-      - "com.centurylinklabs.watchtower.enable=true"
+    image: gitlab.cosy.bio:5050/simonsuewer/biomedformerui/ui-chat:latest
     ports:
       - "8144:4000"
     volumes:
