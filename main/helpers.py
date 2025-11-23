@@ -26,16 +26,14 @@ ALLOWED_RELATIONS = {
     'pathway_pathway', 'pathway_protein', 'phenotype_phenotype', 'phenotype_protein', 'protein_protein'
 }
 
-ALLOWED_NODE_TYPES = {"gene/protein", "drug", "effect/phenotype", "disease", "biological_process", 
-                 "molecular_function", "cellular_component", "exposure", "pathway", "anatomy"}
-
-# ========= LOW-LEVEL CHAT =========
+# ========= CHAT =========
 def send_chat(system: str, user: str, model: str = MODEL_NAME, stream: bool = False) -> str:
     payload = {
         "model": model,
         "messages": [
             {"role": "system", "content": system},
-            {"role": "user", "content": user}
+            {"role": "user", "content": user}      
+            # assistant should be added later
         ],
         "stream": stream
     }
