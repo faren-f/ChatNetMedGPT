@@ -78,7 +78,6 @@ def sentence_to_token_id(sentence, mask_token, relation_index):
     
     ##### remove the indices of masks from the sentence
     mask_indices = []
-    
     for tok in ['mask1', 'mask0']:
         try:
             mask_indices.append([i for i, x in enumerate(sentence) if x == tok][0])
@@ -88,8 +87,9 @@ def sentence_to_token_id(sentence, mask_token, relation_index):
     # print(f'mask_indices: {mask_indices}')
     mask_index_question = mask_indices[0] # The model only prioritize nodes for mask1, so we need to know its index 
     
-    # remove mask tokensfrom the sentence to only remain node tokens
+    # remove mask tokens from the sentence to only remain node tokens
     remaining_indices = list(set(remaining_indices) - set(mask_indices))
+
     # print(f'remaining_indices:{remaining_indices}')
     
     # remove masks from the sentence
@@ -183,6 +183,8 @@ def node_embedding(list_nodes_sentence):
 #         results.append(hits)
 #     return results
 
+
+# maybe I can make this once and not every time
 def build_faiss_ip_index(all_node_emb):
     """
     all_node_emb: [N, D]  (ALL node embeddings)
