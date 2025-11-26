@@ -1,12 +1,19 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import json
 =======
 >>>>>>> 75dab57 (init)
+=======
+import json
+>>>>>>> e329b5c (Enhance FastAPI server with caching support and update response model to include neighbors)
 import logging
 from contextlib import asynccontextmanager
 from typing import Union
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e329b5c (Enhance FastAPI server with caching support and update response model to include neighbors)
 from aiocache import Cache
 from fastapi import FastAPI
 <<<<<<< HEAD
@@ -28,6 +35,7 @@ from src.server.model_loader import load_model
 
 conv = ABConverter()
 <<<<<<< HEAD
+<<<<<<< HEAD
 cache = Cache(Cache.MEMORY, namespace="chat")
 LOG = logging.getLogger(__name__)
 
@@ -44,21 +52,29 @@ class DrugResponse(BaseModel):
 
 
 =======
+=======
+cache = Cache(Cache.MEMORY, namespace="chat")
+>>>>>>> e329b5c (Enhance FastAPI server with caching support and update response model to include neighbors)
 LOG = logging.getLogger(__name__)
-
 
 state = {}
 <<<<<<< HEAD
 >>>>>>> 75dab57 (init)
 =======
 
+
 class DrugResponse(BaseModel):
     """Response model returning a list of recommended drug names."""
     drugs: list[str]
+    neighbors: list[str]
     node_type: str
     sentence: str
 
+<<<<<<< HEAD
 >>>>>>> 57e2b79 (Add docker-compose configuration and enhance FastAPI server with improved response model and metadata)
+=======
+
+>>>>>>> e329b5c (Enhance FastAPI server with caching support and update response model to include neighbors)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     LOG.info("LIFESPACE START")
@@ -72,14 +88,20 @@ async def lifespan(app: FastAPI):
 
     state['model'] = load_model(edges, nodes, mask_token)
 <<<<<<< HEAD
+<<<<<<< HEAD
 
     await cache.clear()
 =======
 >>>>>>> 75dab57 (init)
+=======
+
+    await cache.clear()
+>>>>>>> e329b5c (Enhance FastAPI server with caching support and update response model to include neighbors)
     LOG.info("LIFESPACE Loaded")
     yield
     # --- shutdown ---
     state.clear()
+<<<<<<< HEAD
 <<<<<<< HEAD
     await cache.clear()
     LOG.info("LIFESPACE END")
@@ -128,7 +150,11 @@ async def chat(user_text: Union[
     LOG.info(
         f"A:  {user_text} B: {sentence} (tokens={len(tokenize_b(sentence))}), node_type: {node_type}")
 =======
+=======
+    await cache.clear()
+>>>>>>> e329b5c (Enhance FastAPI server with caching support and update response model to include neighbors)
     LOG.info("LIFESPACE END")
+
 
 app = FastAPI(
     title="ChatNetMedGPT API",
@@ -142,28 +168,39 @@ app = FastAPI(
         "email": "farzaneh.firoozbakht@uni-hamburg.de",
     },
     lifespan=lifespan,
+    root_path_in_servers=False,
 )
 
+
 @app.get(
-    "/chat/",
+    "/chat",
     response_model=DrugResponse,
     summary="Recommend drugs for a clinical question",
     description=(
-        "Takes a free-text clinical question, maps it to the internal graph "
-        "representation, and returns a list of recommended drug names inferred "
-        "by the NetMedGPT model."
+            "Takes a free-text clinical question, maps it to the internal graph "
+            "representation, and returns a list of recommended drug names inferred "
+            "by the NetMedGPT model."
     ),
     tags=["drug-recommendation"],
 )
-def chat(user_text: Union[str, None] = "for diabetes with egfr mutation what is the best treatment and what are the adverse drug reactions") -> DrugResponse:
+async def chat(user_text: Union[
+    str, None] = "for diabetes with egfr mutation what is the best treatment and what are the adverse drug reactions") -> DrugResponse:
     LOG.info(user_text)
+    cached_value = await cache.get(user_text)
+    if cached_value is not None:
+        return cached_value
     sentence, node_type = conv.a_to_b(user_text)
+<<<<<<< HEAD
 <<<<<<< HEAD
     logging.info(f"A:  {user_text} B: {sentence} (tokens={len(tokenize_b(sentence))}), node_type: {node_type}")
 >>>>>>> 75dab57 (init)
 =======
     LOG.info(f"A:  {user_text} B: {sentence} (tokens={len(tokenize_b(sentence))}), node_type: {node_type}")
 >>>>>>> 47500c8 (Refactor sentence processing logic and update logging in server main)
+=======
+    LOG.info(
+        f"A:  {user_text} B: {sentence} (tokens={len(tokenize_b(sentence))}), node_type: {node_type}")
+>>>>>>> e329b5c (Enhance FastAPI server with caching support and update response model to include neighbors)
 
     all_node_names = state['all_node_names']
     node_index = state['node_index']
@@ -210,6 +247,7 @@ def chat(user_text: Union[str, None] = "for diabetes with egfr mutation what is 
         sentence_indices[i] = index
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     sentence_str = ",".join(map(str, sentence_indices))
 
     cached_value = await cache.get(sentence_str)
@@ -237,3 +275,21 @@ def chat(user_text: Union[str, None] = "for diabetes with egfr mutation what is 
 =======
     return DrugResponse(drugs=drug_names.tolist(), node_type=node_type, sentence=sentence)
 >>>>>>> 57e2b79 (Add docker-compose configuration and enhance FastAPI server with improved response model and metadata)
+=======
+    sentence_str = ",".join(map(str, sentence_indices))
+
+    cached_value = await cache.get(sentence_str)
+    if cached_value is not None:
+        return json.loads(sentence_str)
+
+    # Convert indices list to comma-separated string
+    drug_names = inferenceNetMedGpt(sentence_str, node_type, str(mask_index_question), nodes, edges,
+                                    model)
+    response = DrugResponse(drugs=drug_names.tolist(),
+                            node_type=node_type,
+                            neighbors=neighbors,
+                            sentence=sentence)
+    await cache.set(user_text, response, ttl=120)
+    await cache.set(sentence_str, response, ttl=120)
+    return response
+>>>>>>> e329b5c (Enhance FastAPI server with caching support and update response model to include neighbors)

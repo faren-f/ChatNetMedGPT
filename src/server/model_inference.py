@@ -45,6 +45,9 @@ def inferenceNetMedGpt(input, node_type, mask_index_question, nodes, edge, model
 
         drug_names = nodes_at_mask[top_idx, 1]
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e329b5c (Enhance FastAPI server with caching support and update response model to include neighbors)
 
     del sentence, output, logits, probs, top_probs, top_idx, node_ids_at_mask
 
