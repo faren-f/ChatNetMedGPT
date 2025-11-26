@@ -1,0 +1,19 @@
+httpx
+
+# Numerics / Data
+numpy
+pandas
+scipy
+scikit-learn
+tqdm
+requests
+faiss-cpu
+
+transformers>=4.45
+
+torch
+torchvision
+
+fastapi[standard]
+aiocache
+uvicorn
