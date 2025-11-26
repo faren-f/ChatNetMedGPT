@@ -7,7 +7,7 @@ from convertor import *
 protocol = "https"
 hostname = "dev.chat.cosy.bio"
 host = f"{protocol}://{hostname}"
-api_key = "sk-45405987006a4a4d8b4deb9e7588c6bc"
+api_key = "sk-79c40b37ca97437f96c4938695ecfff8"
 api_url = f"{host}/ollama/api/chat"
 MODEL_NAME = "gpt-oss:20b"
 B_MAX_TOKENS = 9
