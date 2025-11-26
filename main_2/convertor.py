@@ -1,6 +1,6 @@
 import re
 
-from main.helpers import looks_like_b_chain, tokenize_b, enforce_max_tokens, revise_b, \
+from helpers import looks_like_b_chain, tokenize_b, enforce_max_tokens, revise_b, \
     is_valid_relation, send_chat
 
 # A: text

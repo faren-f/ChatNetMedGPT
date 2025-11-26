@@ -4,13 +4,14 @@ warnings.filterwarnings("ignore", category=UserWarning)
 
 import os
 import json
+import torch
 import subprocess
 import argparse
 import pandas as pd
 
-from main.convertor import ABConverter
-from main.helpers import tokenize_b
-from main.sentence_preprocessing import sentence_to_token_id, node_embedding, build_faiss_ip_index, search_topk
+from convertor import ABConverter
+from helpers import tokenize_b
+from sentence_preprocessing import sentence_to_token_id, node_embedding, build_faiss_ip_index, search_topk
 
 with open("../data/parameters.json", 'r') as file:
     param = json.load(file)
