@@ -6,7 +6,6 @@ from transformers import AutoTokenizer, AutoModel
 import faiss
 import torch.nn.functional as F
 
-
 ####
 # This code has different parts
 # 1) snake_case the sentence
@@ -106,7 +105,7 @@ def node_embedding(list_nodes_sentence):
     tokenizer = AutoTokenizer.from_pretrained("neuml/pubmedbert-base-embeddings")
     model = AutoModel.from_pretrained("neuml/pubmedbert-base-embeddings")
     
-    attr_nodes = torch.empty((0, 768))
+    emb_nodes = torch.empty((0, 768))
     # Tokenize sentences
     for i in list_nodes_sentence:
         inputs = tokenizer(i, padding=True, truncation=True, max_length=512, return_tensors='pt')
@@ -117,39 +116,78 @@ def node_embedding(list_nodes_sentence):
         
         # Perform pooling. In this case, mean pooling.
         emb = meanpooling(output, inputs['attention_mask'])
-        attr_nodes = torch.concat((attr_nodes, emb), dim = 0)
+        emb_nodes = torch.concat((emb_nodes, emb), dim = 0)
     
-    # print(f'Sentence embeddings: {attr_nodes}')
-    return(attr_nodes)
+    # print(f'Sentence embeddings: {emb_nodes}')
+    return(emb_nodes)
 
 
 ################################################################################################################
 # 4) find the closest nodes to the KG 
-def build_faiss_ip_index(node_emb):
+# def build_faiss_ip_index(node_emb):
+#     """
+#     node_emb: torch.Tensor [N, D] or numpy.ndarray [N, D]
+#     Returns a FAISS index (inner product, i.e. cosine if normalized).
+#     """
+#     if isinstance(node_emb, torch.Tensor):
+#         with torch.no_grad():
+#             nodes = F.normalize(node_emb.float(), dim=1).cpu().numpy()
+#     else:
+#         nodes = node_emb.astype("float32", copy=False)
+#         nodes /= np.linalg.norm(nodes, axis=1, keepdims=True) + 1e-12
+
+#     d = nodes.shape[1]
+#     index = faiss.IndexFlatIP(d)
+#     index.add(nodes)
+#     return index
+
+
+# ###################
+# def search_topk(
+#     index: faiss.Index,
+#     query_emb: torch.Tensor,
+#     node_names: list,   # len N list of strings
+#     k: int = 5
+# ):
+#     """
+#     query_emb: [Q, D] torch tensor
+#     Returns: list of length Q; each is list of (name, cosine, id)
+#     """
+#     with torch.no_grad():
+#         q = F.normalize(query_emb.detach().cpu().float(), dim=1).numpy().astype('float32', copy=False)
+#     sims, ids = index.search(q, k)  # sims: [Q, k], ids: [Q, k]
+#     results = []
+#     for qi in range(q.shape[0]):
+#         hits = []
+#         for j in range(k):
+#             nid = int(ids[qi, j])
+#             if nid == -1:
+#                 continue
+#             hits.append((node_names[nid], float(sims[qi, j]), nid))
+#         results.append(hits)
+#     return results
+
+
+# maybe I can make this once and not every time
+def build_faiss_ip_index(all_node_emb):
     """
-    node_emb: torch.Tensor [N, D] or numpy.ndarray [N, D]
-    Returns a FAISS index (inner product, i.e. cosine if normalized).
+    all_node_emb: [N, D]  (ALL node embeddings)
+    Returns a FAISS cosine-similarity index.
     """
-    import numpy as np, faiss, torch.nn.functional as F, torch
-    
-    if isinstance(node_emb, torch.Tensor):
+    if isinstance(all_node_emb, torch.Tensor):
         with torch.no_grad():
-            nodes = F.normalize(node_emb.float(), dim=1).cpu().numpy()
+            nodes = F.normalize(all_node_emb.float(), dim=1).cpu().numpy()
     else:
-        nodes = node_emb.astype("float32", copy=False)
-        nodes /= np.linalg.norm(nodes, axis=1, keepdims=True) + 1e-12
+        nodes = np.asarray(all_node_emb, dtype=np.float32)
+        nodes /= (np.linalg.norm(nodes, axis=1, keepdims=True) + 1e-12)
 
     d = nodes.shape[1]
     index = faiss.IndexFlatIP(d)
-    index.add(nodes)
+    index.add(nodes)              # <-- all nodes added here
     return index
 
-def search_topk(
-    index: faiss.Index,
-    query_emb: torch.Tensor,
-    node_names: list,   # len N list of strings
-    k: int = 5
-):
+
+def search_topk(index, query_emb, node_names, k=5):
     """
     query_emb: [Q, D] torch tensor
     Returns: list of length Q; each is list of (name, cosine, id)
@@ -166,8 +204,7 @@ def search_topk(
         hits = []
         for j in range(k):
             nid = int(ids[qi, j])
-            if nid == -1:
-                continue
             hits.append((node_names[nid], float(sims[qi, j]), nid))
         results.append(hits)
+
     return results

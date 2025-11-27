@@ -5,7 +5,7 @@ from typing import List, Tuple
 protocol = "https"
 hostname = "dev.chat.cosy.bio"
 host = f"{protocol}://{hostname}"
-api_key = "sk-45405987006a4a4d8b4deb9e7588c6bc"
+api_key = "sk-79c40b37ca97437f96c4938695ecfff8"
 api_url = f"{host}/ollama/api/chat"
 MODEL_NAME = "gpt-oss:20b"
 B_MAX_TOKENS = 9
@@ -24,16 +24,14 @@ ALLOWED_RELATIONS = {
     'pathway_pathway', 'pathway_protein', 'phenotype_phenotype', 'phenotype_protein', 'protein_protein'
 }
 
-ALLOWED_NODE_TYPES = {"gene/protein", "drug", "effect/phenotype", "disease", "biological_process", 
-                 "molecular_function", "cellular_component", "exposure", "pathway", "anatomy"}
-
-# ========= LOW-LEVEL CHAT =========
+# ========= CHAT =========
 def send_chat(system: str, user: str, model: str = MODEL_NAME, stream: bool = False) -> str:
     payload = {
         "model": model,
         "messages": [
             {"role": "system", "content": system},
-            {"role": "user", "content": user}
+            {"role": "user", "content": user}      
+            # assistant should be added later
         ],
         "stream": stream
     }

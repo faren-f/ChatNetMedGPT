@@ -1,3 +1,7 @@
+import warnings
+warnings.filterwarnings("ignore", category=FutureWarning)
+warnings.filterwarnings("ignore", category=UserWarning)
+
 import sys
 import os
 import argparse
@@ -5,8 +9,6 @@ import json
 import pandas as pd
 import torch
 import torch.nn.functional as F
-
-
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../")))
 from src.model_pretrain import *
 

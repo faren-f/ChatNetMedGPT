@@ -70,6 +70,8 @@ class ABConverter:
         # === First model call ===
         # b = send_chat(system, user)
         raw = send_chat(system, user)
+        # print(raw)
+        # print("-*" * 60)
 
         b_line, node_line = None, None
         for line in raw.splitlines():
@@ -136,7 +138,7 @@ class ABConverter:
     
         tokens = tokens[:B_MAX_TOKENS]
         b = " ".join(tokens)
-        return b.strip(), node_type
+        return b.strip(), raw
 
     def b_to_a(self, text_b: str) -> str:
         system = SYSTEM_B_TO_A
