@@ -87,7 +87,8 @@ class ABConverter:
         
         b = b_line
         node_type = node_line
-        
+
+
         def count_masks(tokens):
             n1 = sum(t == MASK_PRIMARY for t in tokens)
             n0 = sum(t == MASK_SECONDARY for t in tokens)

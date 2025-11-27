@@ -47,70 +47,11 @@ def sentence_to_token_id(sentence, mask_token, relation_index):
     sentence = sentence_to_snake(sentence)
     tokens = sentence.split()
 
-
     # keep original 9-length vector of mask_token
     sentence_indices = [mask_token] * 9
 
     # relation -> z_index mapping
     rel2z = dict(zip(relation_index["relation"], relation_index["z_index"]))
-
-###### check later
-    # all_indeces = list(np.arange(0,9)) # first mask token for all of them
-    
-    # find the index of the of the relations in the pseudo-sentence
-    # relation_token_index = [
-    #     {"index": i, "relation_name": tok, "token": rel2z[tok]}
-    #     for i, tok in enumerate(tokens)
-    #     if tok in rel2z
-    # ]
-    
-    # relation_token_index_df = pd.DataFrame(relation_token_index, columns=["index", "relation_name", "token"])
-    # # print(f'relation_token_index_df: {relation_token_index_df}')
-    
-    # # substitute index of relations in the sentence
-    # for i, pos in zip(relation_token_index_df['index'], relation_token_index_df['token']):
-    #     sentence_indices[i] = pos
-    
-    # # print(f'sentence_indices: {sentence_indices}')
-    
-    # # remove relation indices from the sentence to find the tokens of nodes
-    # remaining_indices = list(set(all_indeces) - set(relation_token_index_df['index']))
-    # # print(f'remaining_indices: {remaining_indices}')
-    
-    # ##### remove the indices of masks from the sentence
-    # mask_indices = []
-    # for tok in ['mask1', 'mask0']:
-    #     try:
-    #         mask_indices.append([i for i, x in enumerate(tokens) if x == tok][0])
-    #     except:
-    #         pass
-    
-    # # print(f'mask_indices: {mask_indices}')
-    # mask_index_question = mask_indices[0] # The model only prioritize nodes for mask1, so we need to know its index 
-    
-    # # remove mask tokens from the sentence to only remain node tokens
-    # remaining_indices = list(set(remaining_indices) - set(mask_indices))
-
-    # # print(f'remaining_indices:{remaining_indices}')
-    
-    # # remove masks from the sentence
-    # set_sentence = set(tokens)- {'mask0','mask1'}
-    
-    # # remove relations from the remaning sentence to keep only node_names
-    # set_sentence = set_sentence-set(relation_token_index_df['relation_name'])
-    
-    # list_nodes_sentence = list(set_sentence)
-    # list_nodes_sentence
-    
-    # node_indices = []
-    # for tok in list_nodes_sentence:
-    #     node_indices.append([i for i, x in enumerate(tokens) if x == tok][0])
-    
-    # # print(f'node_indices: {node_indices}')
-    # return(list_nodes_sentence, node_indices, sentence_indices, mask_index_question)
-
-    ###### check later ta enja
-
     relation_names = set(rel2z.keys())
 
     # We collect everything in ONE pass
@@ -248,8 +189,9 @@ def build_faiss_ip_index(all_node_emb):
 
 def search_topk(index, query_emb, node_names, k=5):
     """
-    query_emb: [Q, D]  (one or many queries)
-    Returns top-k neighbors for each query.
+    query_emb: [Q, D] torch tensor
+    Returns: list of length Q; each is list of (name, cosine, id)
+    #TODO SPPED UP
     """
     with torch.no_grad():
         q = query_emb.detach()
@@ -257,7 +199,6 @@ def search_topk(index, query_emb, node_names, k=5):
         q_cpu = q.to(device="cpu", dtype=torch.float32, non_blocking=True).contiguous()
         q_np = q_cpu.numpy()
     sims, ids = index.search(q_np, k)  # sims: [Q, k], ids: [Q, k]
-
     results = []
     for qi in range(q.shape[0]):
         hits = []
