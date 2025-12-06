@@ -58,7 +58,6 @@ class ABConverter:
         self.max_tokens = max_tokens
 
     def a_to_b(self, text_a: str, attempts: int = 3) -> str:
-        
         system = SYSTEM_A_TO_B.format(
         allowed_relations=", ".join(sorted(ALLOWED_RELATIONS)),
         max_tokens=self.max_tokens,

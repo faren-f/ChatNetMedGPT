@@ -21,15 +21,19 @@ LOG = logging.getLogger(__name__)
 
 state = {}
 
+# New ======
+def enumerate_masks(sentence):
+    return sentence.count("MASK")
 
-class DrugResponse(BaseModel):
+class Response(BaseModel):
     """Response model returning a list of recommended drug names."""
-    drugs: list[str]
-    neighbors: list[str]
-    list_nodes_sentence: list[str]
-    node_type: str
-    sentence: str
-
+    message: str
+    predictions: list[str]
+    prediction_type: str
+    # neighbors: list[str]
+    # list_nodes_sentence: list[str]
+    # sentence: str
+# ==========
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -88,6 +92,11 @@ app.add_middleware(
 )
 async def chat(user_text: Union[
     str, None] = "for diabetes with egfr mutation what is the best treatment and what are the adverse drug reactions") -> DrugResponse:
+
+    # New ======
+    message = []
+    # ==========
+    
     LOG.info(user_text)
     cached_value = await cache.get(user_text)
     if cached_value is not None:
@@ -95,7 +104,19 @@ async def chat(user_text: Union[
     sentence, node_type = conv.a_to_b(user_text)
     LOG.info(
         f"A:  {user_text} B: {sentence} (tokens={len(tokenize_b(sentence))}), node_type: {node_type}")
-
+    
+    # New ======
+    n_mask = enumerate_masks(sentence)
+    if n_mask > 1:
+        message.append(
+            f"More than a single question is found in the given query. For now, we only proceed with {node_type}. The user can then refine the query to get response to other questions."
+        )
+    else:
+        message.append(
+            f"The queried node type is {node_type}."
+        )    
+    # =======
+    
     all_node_names = state['all_node_names']
     node_index = state['node_index']
     relation_index = state['relation_index']
@@ -114,30 +135,42 @@ async def chat(user_text: Union[
     LOG.info("Nearest neighbors found:" + str(hits_per_query))
     neighbor_indices = []
     neighbors = []
+    ambiguous_tokens = []     # new ======
     for i, hits in enumerate(hits_per_query):
         # print(f"Query {i}")
         for name, cos, nid in hits:
             neighbors.append(name)
             neighbor_indices.append(nid)
             print(f"  {name}  (id={nid})  cosine={cos:.4f}")
+            # New ========
+            if cos < .8:
+                ambiguous_tokens.append(name)
+            # =============
 
     for i, index in zip(node_indices, neighbor_indices):
         sentence_indices[i] = index
 
     sentence_str = ",".join(map(str, sentence_indices))
-
+    # new =========
+    if ambiguous_tokens:
+    message.append(
+        f"There are ambiguous words in user's query, which we deemed them as following: {','.join(ambiguous_tokens)}")
+    # ==============
     cached_value = await cache.get(sentence_str)
     if cached_value is not None:
         return json.loads(sentence_str)
 
     # Convert indices list to comma-separated string
-    drug_names = inferenceNetMedGpt(sentence_str, node_type, str(mask_index_question), nodes, edges,
-                                    model)
-    response = DrugResponse(drugs=drug_names.tolist(),
-                            node_type=node_type,
-                            neighbors=neighbors,
-                            list_nodes_sentence=list_nodes_sentence,
-                            sentence=sentence)
+    predictions = inferenceNetMedGpt(sentence_str, node_type, str(mask_index_question), nodes, edges, model)
+    # New ========
+    b_text = conv.b_to_a(sentence)
+    message.append(f"The queried question as the agent understood: {b_text}")
+   
+    response = Response(message='\n'.join(message),
+                        predictions=predictions.tolist(),
+                        prediction_type=node_type
+                       )
+    # =============
     await cache.set(user_text, response, ttl=3600)
     await cache.set(sentence_str, response, ttl=3600)
     return response
