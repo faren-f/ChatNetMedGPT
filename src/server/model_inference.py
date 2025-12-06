@@ -1,3 +1,7 @@
+import warnings
+warnings.filterwarnings("ignore", category=FutureWarning)
+warnings.filterwarnings("ignore", category=UserWarning)
+
 from src.model_pretrain import *
 
 N_top = 5
