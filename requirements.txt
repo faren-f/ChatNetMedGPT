@@ -17,3 +17,4 @@ torchvision
 fastapi[standard]
 aiocache
 uvicorn
+sse-starlette
