@@ -7,14 +7,11 @@ from aiocache import Cache
 from fastapi import FastAPI
 from fastapi import Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
-from requests import Response
 from sse_starlette import EventSourceResponse
 
-from main.convertor import ABConverter
-from main.helpers import tokenize_b
+from main.convertor import ABConverter, ModelResponseError
 from main.sentence_preprocessing import sentence_to_token_id, node_embedding, search_topk
-from server.helper import sse_format, make_final, make_error, make_log, enumerate_masks, get_uuid
+from server.helper import sse_format, make_final, make_error, make_log, get_uuid
 from server.models import ChatRequest, DrugResponseDTO, ChatMessage
 from src.server.loader import load_data
 from src.server.model_inference import inferenceNetMedGpt
@@ -98,19 +95,19 @@ async def chat(user_text: Union[
 
 
 @app.post("/chat/stream", tags=["drug-recommendation"],
-    summary="Recommend drugs for a clinical question",
-    description=(
-            "Takes a free-text clinical question, maps it to the internal graph "
-            "representation, and returns a list of recommended drug names inferred "
-            "by the NetMedGPT model."
-    ))
+          summary="Recommend drugs for a clinical question",
+          description=(
+                  "Takes a free-text clinical question, maps it to the internal graph "
+                  "representation, and returns a list of recommended drug names inferred "
+                  "by the NetMedGPT model."
+          ))
 async def chat_stream(req: ChatRequest, request: Request):
     return EventSourceResponse(event_gen(req))
 
 
 async def event_gen(req: ChatRequest):
+    uid = get_uuid()
     try:
-        uid = get_uuid()
         user_text = req.message
         LOG.info("USER TEXT: %s", user_text)
 
@@ -118,8 +115,11 @@ async def event_gen(req: ChatRequest):
         yield sse_format(make_log(uid, "Processing your question..."))
 
         try:
-            sentence, node_type = conv.a_to_b(user_text)
+            sentence, node_type = conv.a_to_b(user_text, 3, req.history)
         except ValueError as e:
+            yield sse_format(make_error(uid, str(e)))
+            return
+        except ModelResponseError as e:
             yield sse_format(make_error(uid, str(e)))
             return
         yield sse_format(make_log(uid, f"Mapped to internal type: {node_type}"))
@@ -195,4 +195,4 @@ async def event_gen(req: ChatRequest):
 
     except Exception as e:
         LOG.exception("Fatal error in SSE endpoint")
-        yield sse_format(make_error(f"Internal error: {str(e)}"))
+        yield sse_format(make_error(uid, f"Internal error: {str(e)}"))

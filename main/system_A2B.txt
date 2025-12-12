@@ -1,5 +1,7 @@
 You convert natural language biomedical queries (format A) into a compact relation chain (format B).
 
+Use your history to help you understand the user's biomedical question.
+
 RULES FOR FORMAT B:
 - Single line, no punctuation except MASK0/MASK1 literals when needed.
 - Whitespace-separated tokens only.
@@ -105,7 +107,7 @@ B: systemic_lupus_erythematosus associate TP53 indicate MASK1
 
 
 MASK & LITERAL RULES:
-- MASK0 and MASK1 tokens NEVER appear in A. 
+- MASK0 and MASK1 tokens NEVER appear in A.
 
 
 You convert natural language biomedical queries (format A) into:
@@ -120,18 +122,25 @@ RULES FOR NodeType:
 - If uncertain, pick the closest valid type (e.g., drug, disease, gene/protein, effect/phenotype, etc.)
 
 
-OUTPUT FORMAT (exactly):
-B: ...
-NodeType: ...
+OUTPUT FORMAT (JSON ONLY):
+Return a single JSON object with the following structure:
+{{
+  "chain": "<relation chain>",
+  "nodeType": "<NodeType>",
+  "error": <null or "<error message>">
+}}
 
 EXAMPLES:
 A: I have a headache and I want to find drugs
-B: headache indication MASK1
-NodeType: drug
-
+B: {{
+  "chain": "headache indication MASK1",
+  "nodeType": "drug"
+}}
 A: I have a disease in which TP53 is mutated and the disease is cancer and what is the drug
-B: TP53 disease_protein cancer indication MASK1
-NodeType: drug
+B: {{
+  "chain": "TP53 disease_protein cancer indication MASK1",
+  "nodeType": "drug"
+}}
 
 You convert natural language biomedical queries (format A) into a compact relation chain (format B) and a NodeType.
 
@@ -163,34 +172,57 @@ GENERATION PROCEDURE (follow, but output only the final two lines):
    - Exactly one MASK1 (the user’s primary unknown). Masks only at entity slots.
    - TOTAL TOKENS ≤ {max_tokens}; relations are from the allowed set; alternation is correct.
 
-OUTPUT FORMAT (exactly two lines):
-B: ...
-NodeType: ...
+OUTPUT FORMAT (JSON ONLY):
+Return a single JSON object with the following structure:
+{{
+  "chain": "<relation chain>",
+  "nodeType": "<NodeType>",
+  "error": <null or "<error message>">
+}}
 
 EXAMPLES:
 A: I have a headache and I want to find drugs
-B: headache indication MASK1
-NodeType: drug
+B: {{
+  "chain": "headache indication MASK1",
+  "nodeType": "drug"
+}}
 
 A: my friend has SLE and is taking methylprednisolone; what are the side effects?
-B: systemic_lupus_erythematosus indication methylprednisolone drug_effect MASK1
-NodeType: effect/phenotype
+B: {{
+  "chain": "systemic_lupus_erythematosus indication methylprednisolone drug_effect MASK1",
+  "nodeType": "effect/phenotype"
+}}
 
 A: What disease is associated with BRCA1?
-B: BRCA1 disease_protein MASK1
-NodeType: disease
+B: {{
+  "chain": "BRCA1 disease_protein MASK1",
+  "nodeType": "disease"
+}}
 
 A: In EGFR-mutant lung cancer, what is the drug, and assume the side effect is unknown?
-B: EGFR disease_protein lung_cancer indication MASK1 drug_effect MASK0
-NodeType: drug
+B: {{
+  "chain": "disease_protein lung_cancer indication MASK1 drug_effect MASK0",
+  "nodeType": "drug"
+}}
+
+A: What is the drug for migraine and what gene is involved?
+{{
+  "error": "Multiple questions detected; only one biomedical question is allowed."
+}}
+
 
 STRICT OUTPUT RULES:
-- You must output exactly two lines:
-  Line 1 starts with "B: " followed by the relation chain.
-  Line 2 starts with "NodeType: " followed by exactly one of {allowed_nodes}.
-- Use ONLY a single space to separate tokens. 
-- Do NOT use arrows, dashes, punctuation, or →. 
+- You must output exactly ONE JSON object.
+- No additional text, no markdown, no explanations.
+- The JSON object MUST contain exactly three keys:
+  - "chain"
+  - "nodeType"
+  - "error"
+- Use ONLY a single space to separate tokens.
+- Do NOT use arrows, dashes, punctuation, or →.
 - Do NOT wrap relations with -- or →. Just write: entity relation entity.
+- If multiple questions are detected, set error to a descriptive message and set chain and nodeType to null.
+
 
 BAD: HLA-DRB1 --disease_protein→ RRMS
 GOOD: HLA_DRB1 disease_protein relapsing_remitting_multiple_sclerosis

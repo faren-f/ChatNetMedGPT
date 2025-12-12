@@ -1,5 +1,7 @@
 import requests
-from typing import List, Tuple
+from typing import List, Tuple, Optional
+
+from server.models import ChatMessage
 
 # ========= SERVER CONFIG =========
 protocol = "https"
@@ -25,14 +27,38 @@ ALLOWED_RELATIONS = {
 }
 
 # ========= CHAT =========
-def send_chat(system: str, user: str, model: str = MODEL_NAME, stream: bool = False) -> str:
+def send_chat_history(system: str, user: str, model: str = MODEL_NAME, stream: bool = False) -> str:
+    #TODO add here assistant messages if needed
+    # if two questions end here and let the user decide
     payload = {
         "model": model,
         "messages": [
             {"role": "system", "content": system},
-            {"role": "user", "content": user}      
+            {"role": "user", "content": user}
             # assistant should be added later
         ],
+        "stream": stream
+    }
+    resp = requests.post(api_url, headers=headers, json=payload)
+    resp.raise_for_status()
+    data = resp.json()
+    return data["message"]["content"].strip()
+
+def send_chat(system: str, user: str, history: Optional[List[ChatMessage]] = None, model: str = MODEL_NAME, stream: bool = False) -> str:
+    #TODO add here assistant messages if needed
+    # if two questions end here and let the user decide
+
+    messages = []
+    if history is not None:
+        for msg in history:
+            messages.append({"role": msg.role.value, "content": msg.text})
+
+    messages.append({"role": "system", "content": system})
+    messages.append({"role": "user", "content": user})
+
+    payload = {
+        "model": model,
+        "messages": messages,
         "stream": stream
     }
     resp = requests.post(api_url, headers=headers, json=payload)
