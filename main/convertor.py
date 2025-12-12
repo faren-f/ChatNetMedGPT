@@ -4,7 +4,7 @@ from typing import List, Optional
 
 from main.helpers import looks_like_b_chain, tokenize_b, enforce_max_tokens, revise_b, \
     is_valid_relation, send_chat
-from server.models import ChatMessage
+from src.server.models import ChatMessage
 
 
 class ModelResponseError(Exception):

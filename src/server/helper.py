@@ -4,7 +4,7 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
-from server.models import ChatMessage, ChatRole, DrugResponseDTO
+from src.server.models import ChatMessage, ChatRole, DrugResponseDTO
 
 RETRY_TIMEOUT = 15000
 

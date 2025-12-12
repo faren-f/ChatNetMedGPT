@@ -11,8 +11,8 @@ from sse_starlette import EventSourceResponse
 
 from main.convertor import ABConverter, ModelResponseError
 from main.sentence_preprocessing import sentence_to_token_id, node_embedding, search_topk
-from server.helper import sse_format, make_final, make_error, make_log, get_uuid
-from server.models import ChatRequest, DrugResponseDTO, ChatMessage
+from src.server.helper import sse_format, make_final, make_error, make_log, get_uuid
+from src.server.models import ChatRequest, DrugResponseDTO, ChatMessage
 from src.server.loader import load_data
 from src.server.model_inference import inferenceNetMedGpt
 from src.server.model_loader import load_model

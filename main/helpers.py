@@ -1,7 +1,7 @@
 import requests
 from typing import List, Tuple, Optional
 
-from server.models import ChatMessage
+from src.server.models import ChatMessage
 
 # ========= SERVER CONFIG =========
 protocol = "https"
