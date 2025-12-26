@@ -174,9 +174,9 @@ class ABConverter:
                 if line.strip().startswith("NodeType:"):
                     node_line = line.replace("NodeType:", "").strip()
 
-            if not b_line:
+            if not b_line or b_line == "null":
                 raise ValueError(f"Model did not return B: line. Got: {raw}")
-            if not node_line:
+            if not node_line or node_line == "null":
                 node_line = "unknown"
 
             b = b_line
