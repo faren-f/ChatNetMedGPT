@@ -160,6 +160,7 @@ async def event_gen(req: ChatRequest):
             sentence_indices[i] = idx
 
         encoded_sentence = ",".join(map(str, sentence_indices))
+        yield sse_format(make_log(uid, "Encoded Sentence" + encoded_sentence))
 
         cached_value = await cache.get(encoded_sentence)
         if cached_value is not None:
