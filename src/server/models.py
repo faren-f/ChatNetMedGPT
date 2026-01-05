@@ -16,6 +16,7 @@ class DrugResponseDTO(BaseModel):
     predictions: List[str]
     prediction_type: str
     message: str
+    pseudo_sentence: str
 
 
 class ChatMessage(BaseModel):

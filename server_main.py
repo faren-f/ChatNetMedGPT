@@ -122,7 +122,9 @@ async def event_gen(req: ChatRequest):
         except ModelResponseError as e:
             yield sse_format(make_error(uid, str(e)))
             return
+
         yield sse_format(make_log(uid, f"Mapped to internal type: {node_type}"))
+        yield sse_format(make_log(uid, f"Converted to pseudo sentence: {sentence}"))
 
         # Cache check
         cached_value = await cache.get(user_text)
@@ -160,7 +162,7 @@ async def event_gen(req: ChatRequest):
             sentence_indices[i] = idx
 
         encoded_sentence = ",".join(map(str, sentence_indices))
-        yield sse_format(make_log(uid, "Encoded Sentence" + encoded_sentence))
+        yield sse_format(make_log(uid, "Encoded Sentence " + encoded_sentence))
 
         cached_value = await cache.get(encoded_sentence)
         if cached_value is not None:
@@ -185,6 +187,7 @@ async def event_gen(req: ChatRequest):
             predictions=predictions.tolist(),
             prediction_type=node_type,
             message=final_msg_text,
+            pseudo_sentence=sentence,
         )
 
         # Cache result
