@@ -7,7 +7,7 @@ from src.server.models import ChatMessage
 protocol = "https"
 hostname = "dev.chat.cosy.bio"
 host = f"{protocol}://{hostname}"
-api_key = "sk-79c40b37ca97437f96c4938695ecfff8"
+api_key = "sk-90311001da5846e08a1cde507b406533"
 api_url = f"{host}/ollama/api/chat"
 MODEL_NAME = "gpt-oss:20b"
 B_MAX_TOKENS = 9
