@@ -1,16 +1,36 @@
 import requests
 from typing import List, Tuple, Optional
+from dotenv import load_dotenv
+import os
 
 from src.server.models import ChatMessage
 
 # ========= SERVER CONFIG =========
-protocol = "https"
-hostname = "dev.chat.cosy.bio"
+
+load_dotenv()
+protocol = os.getenv("CHAT_PROTOCOL", "https")
+hostname = os.getenv("CHAT_HOSTNAME", "dev.chat.cosy.bio")
+api_path = os.getenv("CHAT_API_PATH", "/ollama/api/chat")
+MODEL_NAME = os.getenv("CHAT_MODEL_NAME", "gpt-oss:20b")
+
+api_key = os.getenv("CHAT_API_KEY")
+if not api_key:
+    raise RuntimeError("CHAT_API_KEY is not set. Put it in your .env file.")
+
+B_MAX_TOKENS = int(os.getenv("B_MAX_TOKENS", "9"))
+
 host = f"{protocol}://{hostname}"
-api_key = "sk-90311001da5846e08a1cde507b406533"
-api_url = f"{host}/ollama/api/chat"
-MODEL_NAME = "gpt-oss:20b"
-B_MAX_TOKENS = 9
+api_url = f"{host}{api_path}"
+
+
+# protocol = "https"
+# hostname = "dev.chat.cosy.bio"
+# host = f"{protocol}://{hostname}"
+# api_key = "sk-90311001da5846e08a1cde507b406533"
+# api_url = f"{host}/ollama/api/chat"
+# MODEL_NAME = "gpt-oss:20b"
+# B_MAX_TOKENS = 9
+
 
 headers = {
     "Authorization": f"Bearer {api_key}",

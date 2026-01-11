@@ -13,6 +13,8 @@ data/*
 *.log
 *.safetensors
 *.png
+.env
+*.env
 Result/
 AMiner/
 MetaPath2Vec/Result
