@@ -1,13 +1,11 @@
+import os
 import requests
 from typing import List, Tuple, Optional
-from dotenv import load_dotenv
-import os
-
 from src.server.models import ChatMessage
+from dotenv import load_dotenv
+load_dotenv()
 
 # ========= SERVER CONFIG =========
-
-load_dotenv()
 protocol = os.getenv("CHAT_PROTOCOL", "https")
 hostname = os.getenv("CHAT_HOSTNAME", "dev.chat.cosy.bio")
 api_path = os.getenv("CHAT_API_PATH", "/ollama/api/chat")
@@ -17,20 +15,10 @@ api_key = os.getenv("CHAT_API_KEY")
 if not api_key:
     raise RuntimeError("CHAT_API_KEY is not set. Put it in your .env file.")
 
-B_MAX_TOKENS = int(os.getenv("B_MAX_TOKENS", "9"))
+MAX_TOKENS = int(os.getenv("MAX_TOKENS", "9"))
 
 host = f"{protocol}://{hostname}"
 api_url = f"{host}{api_path}"
-
-
-# protocol = "https"
-# hostname = "dev.chat.cosy.bio"
-# host = f"{protocol}://{hostname}"
-# api_key = "sk-90311001da5846e08a1cde507b406533"
-# api_url = f"{host}/ollama/api/chat"
-# MODEL_NAME = "gpt-oss:20b"
-# B_MAX_TOKENS = 9
-
 
 headers = {
     "Authorization": f"Bearer {api_key}",
@@ -105,14 +93,14 @@ def looks_like_b_chain(tokens: List[str]) -> bool:
                 return False
     return True
 
-def enforce_max_tokens(text: str, max_tokens: int = B_MAX_TOKENS) -> Tuple[bool, str]:
+def enforce_max_tokens(text: str, max_tokens: int = MAX_TOKENS) -> Tuple[bool, str]:
     toks = tokenize_b(text)
     return (len(toks) <= max_tokens, text.strip())
 
 def revise_b(previous_b: str, a_text: str, mask_error: str = "") -> str:
     system = f"""Revise the relation chain (format B) to meet ALL constraints:
 - Use ONLY relations from: {', '.join(sorted(ALLOWED_RELATIONS))}
-- TOTAL TOKENS ≤ {B_MAX_TOKENS}
+- TOTAL TOKENS ≤ {MAX_TOKENS}
 - Alternate ENTITY (even idx) and RELATION (odd idx) starting with ENTITY.
 - Entities are one token; replace spaces with underscores.
 - MASK RULES: exactly one MASK1 (the primary unknown asked by the user), any other unknowns MASK0; masks only in ENTITY slots; allowed masks: MASK1,MASK0; never use [mask].
